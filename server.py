@@ -64,9 +64,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount Assets Directory for static files (emojis, banners, sample audios)
+# Mount Project Assets Directory for static files (emojis, banners, sample audios)
 if ASSETS_DIR.exists():
-    app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
+    app.mount("/media", StaticFiles(directory=str(ASSETS_DIR)), name="media")
 
 # Global Detector Instances (Lazy or Startup Initialized)
 face_detector: Optional[FacialEmotionDetector] = None
@@ -179,7 +179,7 @@ def get_sample_files():
             if f.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp"]:
                 sample_faces.append({
                     "name": f.name,
-                    "url": f"/assets/samples/faces/{f.name}",
+                    "url": f"/media/samples/faces/{f.name}",
                 })
 
     sample_audios = []
@@ -187,7 +187,7 @@ def get_sample_files():
         for f in AUDIO_SAMPLES_DIR.glob("*.wav"):
             sample_audios.append({
                 "name": f.name,
-                "url": f"/assets/samples/audio/{f.name}",
+                "url": f"/media/samples/audio/{f.name}",
             })
 
     return {
