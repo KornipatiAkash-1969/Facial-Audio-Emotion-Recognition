@@ -1,17 +1,17 @@
 # AffectSense AI • Multimodal Emotion Recognition Platform
 
-[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![TensorFlow](https://img.shields.io/badge/Deep%20Learning-TensorFlow%20%2F%20Keras-FF6F00?logo=tensorflow&logoColor=white)](https://tensorflow.org/)
-[![Vercel](https://img.shields.io/badge/Deployed-Vercel-000000?logo=vercel&logoColor=white)](https://frontend-roan-eight-55.vercel.app)
-[![Render](https://img.shields.io/badge/Backend-Render%20Ready-46E3B7?logo=render&logoColor=black)](https://render.com)
+[![TensorFlow](https://img.shields.io/badge/Deep%20Learning-TensorFlow%20%2F%20Keras%203-FF6F00?logo=tensorflow&logoColor=white)](https://tensorflow.org/)
+[![Local Only](https://img.shields.io/badge/Mode-Local%20Execution-success?logo=windows&logoColor=white)](http://localhost:8000)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 An enterprise-grade, dual-modality affective computing platform combining **Computer Vision (Facial Expression Recognition)** and **Acoustic Signal Processing (Speech Emotion Recognition)** with a **Mathematical Decision-Level Late Fusion Engine**.
 
-🌐 **Live Vercel Frontend:** [https://frontend-roan-eight-55.vercel.app](https://frontend-roan-eight-55.vercel.app)  
-🚀 **Deploy Backend on Render (1-Click):** [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/KornipatiAkash-1969/Facial-Audio-Emotion-Recognition)
+💻 **Local Web UI & REST API:** [http://localhost:8000](http://localhost:8000) (Unified Single-Port Delivery)  
+⚡ **Local React Dev Server:** [http://localhost:5173](http://localhost:5173) (Vite HMR Hot-Reloading)  
+📚 **Interactive OpenAPI Swagger Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)  
 
 ---
 
@@ -24,11 +24,11 @@ An enterprise-grade, dual-modality affective computing platform combining **Comp
    - [B. Acoustic Vocal Modality Pipeline](#b-acoustic-vocal-modality-pipeline)
    - [C. Multimodal Decision-Level Late Fusion](#c-multimodal-decision-level-late-fusion)
 5. [Universal 7 Emotion Taxonomy](#-universal-7-emotion-taxonomy)
-6. [How to Run](#-how-to-run)
-   - [Method 1: Live Cloud Deployment (Vercel + Render)](#method-1-live-cloud-deployment-vercel--render)
-   - [Method 2: Run Full-Stack Locally (FastAPI + React)](#method-2-run-full-stack-locally-fastapi--react)
-   - [Method 3: Command-Line Interface (CLI)](#method-3-command-line-interface-cli)
-   - [Method 4: Automated Test Suite & Evaluation](#method-4-automated-test-suite--evaluation)
+6. [How to Run Locally](#-how-to-run-locally)
+   - [Method 1: Run Full-Stack Locally (FastAPI + React)](#method-1-run-full-stack-locally-fastapi--react)
+   - [Method 2: Command-Line Interface (CLI)](#method-2-command-line-interface-cli)
+   - [Method 3: Automated Test Suite & Evaluation](#method-3-automated-test-suite--evaluation)
+   - [Method 4: Model Training & Data Augmentation](#method-4-model-training--data-augmentation)
    - [Method 5: Run with Docker](#method-5-run-with-docker)
 7. [Curated Test Image Suite](#-curated-test-image-suite)
 8. [API Endpoints Reference](#-api-endpoints-reference)
@@ -175,28 +175,12 @@ flowchart TD
 
 ---
 
-## 🚀 How to Run
+## 🚀 How to Run Locally
 
-### Method 1: Live Cloud Deployment (Vercel + Render)
+### Method 1: Run Full-Stack Locally (FastAPI + React)
 
-- **Frontend (Live)**: Open [https://frontend-roan-eight-55.vercel.app](https://frontend-roan-eight-55.vercel.app).
-- **Backend (Render Setup)**:
-  1. Go to [render.com](https://render.com) and click **New +** → **Web Service**.
-  2. Connect your GitHub repository.
-  3. Fill in:
-     - **Build Command**: `pip install -r requirements.txt`
-     - **Start Command**: `uvicorn server:app --host 0.0.0.0 --port $PORT`
-  4. Once live, paste your `https://your-service.onrender.com` URL into the **Connect Render** input in the web app or set `VITE_API_URL` on Vercel!
-
----
-
-### Method 2: Run Full-Stack Locally (FastAPI + React)
-
-#### 1. Clone & Setup Environment
+#### 1. Setup Python Environment
 ```bash
-git clone https://github.com/KornipatiAkash-1969/Facial-Audio-Emotion-Recognition.git
-cd Facial-Audio-Emotion-Recognition
-
 # Create and activate Python virtual environment
 python -m venv venv
 # Windows:
@@ -211,10 +195,12 @@ pip install -r requirements.txt
 #### 2. Start Backend API Server
 ```bash
 python server.py
-# Server runs on http://localhost:8000 (API Docs: http://localhost:8000/docs)
+# Server runs on http://localhost:8000
+# OpenAPI Docs available at http://localhost:8000/docs
+# Unified Frontend also served directly from http://localhost:8000
 ```
 
-#### 3. Start Frontend Development Server
+#### 3. (Optional) Start Frontend Dev Server with Hot Reload
 ```bash
 cd frontend
 npm install
