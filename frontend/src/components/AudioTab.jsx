@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { predictAudio } from '../services/api';
 import { WavRecorder } from '../utils/wavRecorder';
 import EmotionBarChart from './EmotionBarChart';
@@ -11,12 +11,27 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const fileInputRef = useRef(null);
 
   // Microphone recording state
   const [isRecording, setIsRecording] = useState(false);
   const [recordDuration, setRecordDuration] = useState(0);
   const recorderRef = useRef(null);
   const timerRef = useRef(null);
+
+  // Clean up recording on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (recorderRef.current) {
+        try {
+          recorderRef.current.stop();
+        } catch (e) {}
+      }
+    };
+  }, []);
 
   const startRecording = async () => {
     setError(null);
@@ -70,32 +85,25 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
     }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      setAudioUrl(URL.createObjectURL(file));
-      setResult(null);
-      setError(null);
-    }
-  };
-
-  const handlePredictFile = async () => {
-    if (!selectedFile) return;
+  // Automatic analysis upon selecting/dropping audio file
+  const processAudioFile = async (file) => {
+    if (!file) return;
+    setSelectedFile(file);
+    setAudioUrl(URL.createObjectURL(file));
     setLoading(true);
     setError(null);
     try {
-      const res = await predictAudio(selectedFile);
+      const res = await predictAudio(file);
       setResult(res);
       if (setMultimodalAudio) {
-        setMultimodalAudio({ file: selectedFile, name: selectedFile.name });
+        setMultimodalAudio({ file, name: file.name });
       }
       if (onAddHistory) {
         onAddHistory({
           modality: 'Audio (File)',
           emotion: res.emotion,
           confidence: res.confidence,
-          source: selectedFile.name,
+          source: file.name,
         });
       }
     } catch (err) {
@@ -105,6 +113,37 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
     }
   };
 
+  const handleFileInputChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processAudioFile(file);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Drag and drop handlers
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processAudioFile(file);
+    }
+  };
+
+  // Sample selection
   const handleSelectSample = async (sampleName) => {
     setSelectedSample(sampleName);
     const sampleObj = samples?.audios?.find((a) => a.name === sampleName);
@@ -163,22 +202,19 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
           <div className="input-group">
             <input
               type="file"
-              id="audio-file-input"
-              accept=".wav,.mp3,.ogg,.flac"
-              onChange={handleFileChange}
+              ref={fileInputRef}
+              accept=".wav,.mp3,.ogg,.flac,audio/*"
+              onChange={handleFileInputChange}
               style={{ display: 'none' }}
             />
-            <label htmlFor="audio-file-input" className="btn btn-secondary">
-              Choose Audio File
-            </label>
-            {selectedFile && <span className="file-name">{selectedFile.name}</span>}
             <button
               className="btn btn-primary"
-              onClick={handlePredictFile}
-              disabled={!selectedFile || loading}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={loading}
             >
-              {loading ? 'Analyzing Acoustics...' : 'Predict Speech Emotion'}
+              {loading ? 'Analyzing Acoustics...' : '📂 Choose Audio File'}
             </button>
+            {selectedFile && <span className="file-name">{selectedFile.name}</span>}
           </div>
         )}
 
@@ -222,22 +258,88 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
       <div className="grid-2col">
         {/* Left Column: Player & Signal Card */}
         <div className="card display-card">
-          <h3 className="card-heading">Speech Signal & Audio Playback</h3>
-          <div className="audio-display-box">
+          <div className="card-header-flex">
+            <h3 className="card-heading">Speech Signal & Audio Playback</h3>
+            {mode === 'upload' && (
+              <span className="hint-pill">Drag & drop or click box to upload</span>
+            )}
+          </div>
+
+          <div
+            className={`audio-display-box ${isDragOver ? 'drag-over' : ''} ${
+              mode === 'upload' && !audioUrl ? 'clickable-zone' : ''
+            }`}
+            onDragOver={mode === 'upload' ? handleDragOver : undefined}
+            onDragLeave={mode === 'upload' ? handleDragLeave : undefined}
+            onDrop={mode === 'upload' ? handleDrop : undefined}
+            onClick={() => {
+              if (mode === 'upload' && !loading && !audioUrl) {
+                fileInputRef.current?.click();
+              }
+            }}
+          >
+            {mode === 'record' && !isRecording && !audioUrl && (
+              <div className="placeholder-box">
+                <span className="placeholder-icon">🎙️</span>
+                <strong style={{ fontSize: '15px', color: '#E2E8F0' }}>
+                  Microphone is Currently Idle
+                </strong>
+                <p style={{ marginTop: '8px' }}>
+                  Click below to begin speaking and analyze your voice emotion in real time.
+                </p>
+                <button
+                  className="btn btn-success"
+                  style={{ marginTop: '16px' }}
+                  onClick={startRecording}
+                >
+                  🔴 Start Recording
+                </button>
+              </div>
+            )}
+
             {audioUrl ? (
-              <div className="audio-player-wrapper">
+              <div
+                className="audio-player-wrapper"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {mode === 'upload' && (
+                  <button
+                    className="btn-change-image"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    🔄 Change Audio
+                  </button>
+                )}
                 <div className="audio-icon-banner">🎙️</div>
                 <h4 className="audio-title">
                   {selectedFile?.name || selectedSample || 'Microphone Recording'}
                 </h4>
                 <audio controls src={audioUrl} className="audio-element" />
+                {loading && (
+                  <div className="loading-overlay" style={{ marginTop: '16px' }}>
+                    <span className="spinner">⏳</span>
+                    <p>Extracting 40 MFCCs & Classifying Acoustic Emotion...</p>
+                  </div>
+                )}
               </div>
-            ) : (
+            ) : mode !== 'record' ? (
               <div className="placeholder-box">
                 <span className="placeholder-icon">🔊</span>
-                <p>Upload a .wav file, choose a sample, or record your voice to inspect acoustic emotion.</p>
+                <strong style={{ fontSize: '15px', color: '#E2E8F0' }}>
+                  Click to Browse or Drag & Drop Audio File (.wav)
+                </strong>
+                <p style={{ marginTop: '6px' }}>Supports WAV, MP3, FLAC, and OGG</p>
+                {mode === 'upload' && (
+                  <button
+                    className="btn btn-primary"
+                    style={{ marginTop: '14px' }}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    📂 Browse Audio Files
+                  </button>
+                )}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -245,7 +347,12 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
         <div className="card metrics-card">
           <h3 className="card-heading">Acoustic Emotion Analysis</h3>
 
-          {result ? (
+          {loading && !result ? (
+            <div className="placeholder-box">
+              <span className="placeholder-icon">⏳</span>
+              <p>Extracting speech acoustic features...</p>
+            </div>
+          ) : result ? (
             <div className="metrics-content">
               <div className="top-result-badge">
                 <span className="emotion-title">{result.emotion}</span>
@@ -267,7 +374,7 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
           ) : (
             <div className="placeholder-box">
               <span className="placeholder-icon">📊</span>
-              <p>Awaiting speech audio input to generate acoustic emotion metrics.</p>
+              <p>Select or record audio to view speech emotion metrics and probability distribution.</p>
             </div>
           )}
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { predictMultimodal } from '../services/api';
 import EmotionBarChart from './EmotionBarChart';
 
@@ -11,20 +11,31 @@ export default function FusionTab({
   const [faceWeight, setFaceWeight] = useState(0.5);
   const [selectedFaceSample, setSelectedFaceSample] = useState('');
   const [selectedAudioSample, setSelectedAudioSample] = useState('');
+  const [uploadedFaceFile, setUploadedFaceFile] = useState(null);
+  const [uploadedAudioFile, setUploadedAudioFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  const activeFace = multimodalFace?.name || (selectedFaceSample ? selectedFaceSample : null);
-  const activeAudio = multimodalAudio?.name || (selectedAudioSample ? selectedAudioSample : null);
+  const faceFileInputRef = useRef(null);
+  const audioFileInputRef = useRef(null);
+
+  const activeFace =
+    uploadedFaceFile?.name ||
+    multimodalFace?.name ||
+    (selectedFaceSample ? selectedFaceSample : null);
+  const activeAudio =
+    uploadedAudioFile?.name ||
+    multimodalAudio?.name ||
+    (selectedAudioSample ? selectedAudioSample : null);
 
   const handleRunFusion = async () => {
     if (!activeFace) {
-      setError('Please select or capture a face input first (via Face Tab or dropdown below).');
+      setError('Please select or upload a face input first (via Face Tab, upload button, or sample dropdown).');
       return;
     }
     if (!activeAudio) {
-      setError('Please select or record a speech audio input first (via Audio Tab or dropdown below).');
+      setError('Please select or upload a speech audio input first (via Audio Tab, upload button, or sample dropdown).');
       return;
     }
 
@@ -36,12 +47,14 @@ export default function FusionTab({
         audioWeight: 1.0 - faceWeight,
       };
 
-      if (multimodalFace?.base64) payload.faceBase64 = multimodalFace.base64;
+      if (uploadedFaceFile) payload.faceFile = uploadedFaceFile;
+      else if (multimodalFace?.base64) payload.faceBase64 = multimodalFace.base64;
       else if (multimodalFace?.file) payload.faceFile = multimodalFace.file;
       else if (selectedFaceSample) payload.faceSample = selectedFaceSample;
       else if (multimodalFace?.sample) payload.faceSample = multimodalFace.sample;
 
-      if (multimodalAudio?.file) payload.audioFile = multimodalAudio.file;
+      if (uploadedAudioFile) payload.audioFile = uploadedAudioFile;
+      else if (multimodalAudio?.file) payload.audioFile = multimodalAudio.file;
       else if (selectedAudioSample) payload.audioSample = selectedAudioSample;
       else if (multimodalAudio?.sample) payload.audioSample = multimodalAudio.sample;
 
@@ -78,18 +91,45 @@ export default function FusionTab({
               <p className="source-name">
                 {activeFace ? `Active: ${activeFace}` : 'No face selected'}
               </p>
-              <select
-                className="select-dropdown-small"
-                value={selectedFaceSample}
-                onChange={(e) => setSelectedFaceSample(e.target.value)}
-              >
-                <option value="">-- Or Select Sample Face --</option>
-                {samples?.faces?.map((f) => (
-                  <option key={f.name} value={f.name}>
-                    {f.name}
-                  </option>
-                ))}
-              </select>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px' }}>
+                <input
+                  type="file"
+                  ref={faceFileInputRef}
+                  accept="image/*,.jpg,.jpeg,.png,.webp,.bmp"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) {
+                      setUploadedFaceFile(f);
+                      setSelectedFaceSample('');
+                    }
+                    e.target.value = '';
+                  }}
+                />
+                <button
+                  className="btn btn-secondary"
+                  style={{ fontSize: '11px', padding: '5px 10px' }}
+                  onClick={() => faceFileInputRef.current?.click()}
+                >
+                  📁 Upload Photo
+                </button>
+                <select
+                  className="select-dropdown-small"
+                  style={{ marginTop: 0 }}
+                  value={selectedFaceSample}
+                  onChange={(e) => {
+                    setSelectedFaceSample(e.target.value);
+                    setUploadedFaceFile(null);
+                  }}
+                >
+                  <option value="">-- Or Sample Face --</option>
+                  {samples?.faces?.map((f) => (
+                    <option key={f.name} value={f.name}>
+                      {f.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
@@ -101,18 +141,45 @@ export default function FusionTab({
               <p className="source-name">
                 {activeAudio ? `Active: ${activeAudio}` : 'No audio selected'}
               </p>
-              <select
-                className="select-dropdown-small"
-                value={selectedAudioSample}
-                onChange={(e) => setSelectedAudioSample(e.target.value)}
-              >
-                <option value="">-- Or Select Sample Audio --</option>
-                {samples?.audios?.map((a) => (
-                  <option key={a.name} value={a.name}>
-                    {a.name}
-                  </option>
-                ))}
-              </select>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px' }}>
+                <input
+                  type="file"
+                  ref={audioFileInputRef}
+                  accept=".wav,.mp3,.ogg,.flac,audio/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) {
+                      setUploadedAudioFile(f);
+                      setSelectedAudioSample('');
+                    }
+                    e.target.value = '';
+                  }}
+                />
+                <button
+                  className="btn btn-secondary"
+                  style={{ fontSize: '11px', padding: '5px 10px' }}
+                  onClick={() => audioFileInputRef.current?.click()}
+                >
+                  📁 Upload Audio
+                </button>
+                <select
+                  className="select-dropdown-small"
+                  style={{ marginTop: 0 }}
+                  value={selectedAudioSample}
+                  onChange={(e) => {
+                    setSelectedAudioSample(e.target.value);
+                    setUploadedAudioFile(null);
+                  }}
+                >
+                  <option value="">-- Or Sample Audio --</option>
+                  {samples?.audios?.map((a) => (
+                    <option key={a.name} value={a.name}>
+                      {a.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>

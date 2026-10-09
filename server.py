@@ -222,7 +222,7 @@ async def predict_face(
         else:
             raise HTTPException(status_code=400, detail="Must provide an image file or sample_name.")
 
-        res = face_detector.predict(frame, annotate=True)
+        res = detector.predict(frame, annotate=True)
         annotated_b64 = encode_image_base64(res["annotated_frame"])
 
         return {
