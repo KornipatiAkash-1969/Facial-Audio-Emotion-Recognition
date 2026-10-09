@@ -278,6 +278,32 @@ docker run -p 8000:8000 affectsense-backend
 
 ---
 
+### Method 6: Model Training & Data Augmentation
+
+Both models support end-to-end training and fine-tuning with multi-sample data augmentation for high generalization across real-world environments:
+
+#### 1. Train Facial Emotion CNN Model
+Trains on FER-style grayscale datasets (28,709 training images + 7,178 validation images) with real-time data augmentation (horizontal flips, 8% rotation, 8% zoom, translation):
+```bash
+# Fine-tune existing weights on augmented dataset
+python src/train_facial.py --epochs 5 --batch_size 64 --lr 0.00005
+
+# Or train completely from scratch
+python src/train_facial.py --from_scratch --epochs 30 --batch_size 64
+```
+
+#### 2. Train Speech Emotion Model with 5× Acoustic Augmentation
+Extracts 40 MFCCs across the 2,800 base TESS audio recordings, synthesizing **14,000 augmented acoustic vectors** using ambient noise injection, ±1.5 semitone pitch shifting, and tempo perturbation:
+```bash
+# Train MLP classifier with 5x multi-sample acoustic augmentation
+python src/train_audio.py --model_type mlp --n_mfcc 40
+
+# Or train Random Forest classifier
+python src/train_audio.py --model_type rf --n_mfcc 40
+```
+
+---
+
 ## 📁 Curated Test Image Suite
 
 A dedicated [`test_images/`](test_images/) folder is included to test single and multi-face scenarios:
