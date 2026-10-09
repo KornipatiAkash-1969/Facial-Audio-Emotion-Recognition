@@ -2,7 +2,37 @@
  * API Client for interacting with the FastAPI Emotion Recognition Backend
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || "";
+export function getApiBase() {
+  const custom = typeof window !== 'undefined' ? localStorage.getItem('custom_api_url') : null;
+  if (custom && custom.trim()) {
+    return custom.trim().replace(/\/+$/, '');
+  }
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && envUrl.trim()) {
+    return envUrl.trim().replace(/\/+$/, '');
+  }
+  if (
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ) {
+    return 'http://localhost:8000';
+  }
+  return '';
+}
+
+export function setCustomApiUrl(url) {
+  if (typeof window === 'undefined') return;
+  if (!url || !url.trim()) {
+    localStorage.removeItem('custom_api_url');
+  } else {
+    localStorage.setItem('custom_api_url', url.trim().replace(/\/+$/, ''));
+  }
+}
+
+export function getCustomApiUrl() {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem('custom_api_url') || '';
+}
 
 const DEFAULT_SAMPLES = {
   faces: [
@@ -38,14 +68,14 @@ const DEFAULT_SAMPLES = {
 };
 
 export async function fetchSystemStatus() {
-  const res = await fetch(`${API_BASE}/api/status`);
+  const res = await fetch(`${getApiBase()}/api/status`);
   if (!res.ok) throw new Error("Failed to fetch system status");
   return res.json();
 }
 
 export async function fetchSampleFiles() {
   try {
-    const res = await fetch(`${API_BASE}/api/samples`);
+    const res = await fetch(`${getApiBase()}/api/samples`);
     if (res.ok) return await res.json();
   } catch (err) {
     // Fall back to bundled samples if backend is starting or offline
@@ -61,7 +91,7 @@ export async function predictFace(fileOrSample) {
     formData.append("file", fileOrSample);
   }
 
-  const res = await fetch(`${API_BASE}/api/predict/face`, {
+  const res = await fetch(`${getApiBase()}/api/predict/face`, {
     method: "POST",
     body: formData,
   });
@@ -73,7 +103,7 @@ export async function predictFace(fileOrSample) {
 }
 
 export async function predictFaceBase64(base64Image) {
-  const res = await fetch(`${API_BASE}/api/predict/face-base64`, {
+  const res = await fetch(`${getApiBase()}/api/predict/face-base64`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ image: base64Image }),
@@ -93,7 +123,7 @@ export async function predictAudio(fileOrSample) {
     formData.append("file", fileOrSample);
   }
 
-  const res = await fetch(`${API_BASE}/api/predict/audio`, {
+  const res = await fetch(`${getApiBase()}/api/predict/audio`, {
     method: "POST",
     body: formData,
   });
@@ -124,7 +154,7 @@ export async function predictMultimodal({
   formData.append("face_weight", faceWeight);
   formData.append("audio_weight", audioWeight);
 
-  const res = await fetch(`${API_BASE}/api/predict/multimodal`, {
+  const res = await fetch(`${getApiBase()}/api/predict/multimodal`, {
     method: "POST",
     body: formData,
   });

@@ -411,6 +411,7 @@ if frontend_dist.exists():
 
 
 if __name__ == "__main__":
-    print("Starting Multimodal Emotion Recognition FastAPI Server on http://localhost:8000")
-    uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    print(f"Starting Multimodal Emotion Recognition FastAPI Server on port {port}")
+    uvicorn.run("server:app", host="0.0.0.0", port=port, reload=False)
 

@@ -1,5 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { fetchSystemStatus, fetchSampleFiles } from './services/api';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  fetchSystemStatus,
+  fetchSampleFiles,
+  getApiBase,
+  setCustomApiUrl,
+  getCustomApiUrl,
+} from './services/api';
 import FaceTab from './components/FaceTab';
 import AudioTab from './components/AudioTab';
 import FusionTab from './components/FusionTab';
@@ -15,6 +21,12 @@ export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('app-theme') || 'dark');
   const [initialLoading, setInitialLoading] = useState(true);
 
+  // Backend connection state
+  const [customApiUrl, setCustomApiUrlState] = useState(() => getCustomApiUrl() || getApiBase());
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [connectMsg, setConnectMsg] = useState(null);
+
   // Shared inputs for Multimodal tab
   const [multimodalFace, setMultimodalFace] = useState(null);
   const [multimodalAudio, setMultimodalAudio] = useState(null);
@@ -28,30 +40,60 @@ export default function App() {
     localStorage.setItem('app-theme', theme);
   }, [theme]);
 
+  const checkConnection = useCallback(async () => {
+    try {
+      const s = await fetchSystemStatus();
+      setStatus(s);
+      setBackendOnline(true);
+      const smp = await fetchSampleFiles();
+      setSamples(smp);
+      return true;
+    } catch (err) {
+      setBackendOnline(false);
+      return false;
+    }
+  }, []);
+
   useEffect(() => {
     async function init() {
-      try {
-        const s = await fetchSystemStatus();
-        setStatus(s);
-        setBackendOnline(true);
-      } catch (err) {
-        setBackendOnline(false);
-      }
-
-      try {
-        const smp = await fetchSampleFiles();
-        setSamples(smp);
-      } catch (err) {
-        console.error('Failed to load samples:', err);
-      } finally {
-        setInitialLoading(false);
-      }
+      await checkConnection();
+      setInitialLoading(false);
     }
-
     init();
-    const interval = setInterval(init, 8000);
+    const interval = setInterval(checkConnection, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [checkConnection]);
+
+  const handleConnectUrl = async (urlToTest) => {
+    setIsConnecting(true);
+    setConnectMsg(null);
+    const targetUrl = (urlToTest || '').trim();
+    setCustomApiUrl(targetUrl);
+    setCustomApiUrlState(targetUrl);
+
+    try {
+      const s = await fetchSystemStatus();
+      setStatus(s);
+      setBackendOnline(true);
+      const smp = await fetchSampleFiles();
+      setSamples(smp);
+      setConnectMsg({
+        type: 'success',
+        text: `✅ Connected to backend at ${getApiBase()}!`,
+      });
+      setTimeout(() => {
+        setShowConfigModal(false);
+      }, 1500);
+    } catch (err) {
+      setBackendOnline(false);
+      setConnectMsg({
+        type: 'error',
+        text: `❌ Could not connect to ${targetUrl || 'backend'}. Please verify your Render URL.`,
+      });
+    } finally {
+      setIsConnecting(false);
+    }
+  };
 
   const addHistoryItem = (item) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -154,21 +196,131 @@ export default function App() {
             </button>
           </div>
 
-          <div className="nav-status">
+          <button
+            className={`nav-status-btn ${backendOnline ? 'status-online' : 'status-offline'}`}
+            onClick={() => setShowConfigModal(true)}
+            title="Click to configure Render or Localhost Backend URL"
+          >
             <span className={`status-dot ${backendOnline ? 'dot-online' : 'dot-offline'}`} />
             <span className="status-text">
-              {backendOnline ? 'REST API Online' : 'Connecting...'}
+              {backendOnline ? 'Backend Online' : 'Connect Backend'}
             </span>
-          </div>
+            <span className="gear-icon">⚙️</span>
+          </button>
         </div>
       </header>
 
       {/* Main Content View */}
       <main className="main-content">
         {!backendOnline && (
-          <div className="alert-warning">
-            ⚠️ <strong>Backend API server not detected on port 8000.</strong> Run{' '}
-            <code>python server.py</code> in the project directory to connect the AI models.
+          <div className="backend-connect-card">
+            <div className="backend-connect-header">
+              <span className="backend-connect-icon">☁️</span>
+              <div>
+                <h3 className="backend-connect-title">Connect Render Backend Service</h3>
+                <p className="backend-connect-desc">
+                  This frontend is running live on <strong>Vercel</strong>. To connect your cloud or local ML engine, enter your <strong>Render backend URL</strong> below (or connect to localhost).
+                </p>
+              </div>
+            </div>
+
+            <div className="backend-connect-form">
+              <div className="input-group-flex">
+                <input
+                  type="url"
+                  className="backend-url-input"
+                  placeholder="https://your-service.onrender.com"
+                  value={customApiUrl}
+                  onChange={(e) => setCustomApiUrlState(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleConnectUrl(customApiUrl)}
+                />
+                <button
+                  className="btn btn-primary"
+                  onClick={() => handleConnectUrl(customApiUrl)}
+                  disabled={isConnecting}
+                >
+                  {isConnecting ? 'Connecting...' : '🔗 Connect Render'}
+                </button>
+                <button
+                  className="btn btn-outline"
+                  onClick={() => handleConnectUrl('http://localhost:8000')}
+                  disabled={isConnecting}
+                >
+                  💻 Localhost:8000
+                </button>
+              </div>
+
+              {connectMsg && (
+                <div className={`connect-status-msg ${connectMsg.type}`}>
+                  {connectMsg.text}
+                </div>
+              )}
+
+              <div className="backend-connect-tips">
+                <span>
+                  💡 <strong>Render Setup:</strong> Create a Web Service on <a href="https://render.com" target="_blank" rel="noreferrer">render.com</a> from your repo with start command <code>uvicorn server:app --host 0.0.0.0 --port $PORT</code>. Once active, paste your <code>https://...onrender.com</code> URL above!
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Backend Configuration Modal */}
+        {showConfigModal && (
+          <div className="modal-backdrop" onClick={() => setShowConfigModal(false)}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>⚙️ Backend API Configuration</h3>
+                <button className="btn-close-modal" onClick={() => setShowConfigModal(false)}>✕</button>
+              </div>
+              <div className="modal-body">
+                <p className="modal-desc">
+                  Configure the FastAPI endpoint that powers facial and audio emotion recognition:
+                </p>
+                <div className="input-group-vertical">
+                  <label className="input-label">Backend Service URL:</label>
+                  <input
+                    type="url"
+                    className="backend-url-input"
+                    placeholder="https://your-service.onrender.com or http://localhost:8000"
+                    value={customApiUrl}
+                    onChange={(e) => setCustomApiUrlState(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleConnectUrl(customApiUrl)}
+                  />
+                </div>
+                {connectMsg && (
+                  <div className={`connect-status-msg ${connectMsg.type}`}>
+                    {connectMsg.text}
+                  </div>
+                )}
+                <div className="modal-actions">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleConnectUrl(customApiUrl)}
+                    disabled={isConnecting}
+                  >
+                    {isConnecting ? 'Testing...' : '🔗 Save & Connect'}
+                  </button>
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => handleConnectUrl('http://localhost:8000')}
+                    disabled={isConnecting}
+                  >
+                    💻 Use Localhost:8000
+                  </button>
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => {
+                      setCustomApiUrl('');
+                      setCustomApiUrlState('');
+                      handleConnectUrl('');
+                    }}
+                  >
+                    🔄 Reset Default
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
