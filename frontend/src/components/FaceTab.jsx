@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { predictFace, predictFaceBase64 } from '../services/api';
 import EmotionBarChart from './EmotionBarChart';
+import Loader from './Loader';
 
 export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
   const [mode, setMode] = useState('upload'); // 'upload' | 'webcam' | 'sample'
@@ -501,8 +502,7 @@ export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
 
                 {loading && (
                   <div className="loading-overlay">
-                    <span className="spinner">⏳</span>
-                    <p>Detecting Faces & Analyzing Emotion...</p>
+                    <Loader text="Detecting Faces & Analyzing Emotion..." />
                   </div>
                 )}
               </div>
@@ -542,8 +542,7 @@ export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
                 )}
                 {loading && (
                   <div className="loading-overlay">
-                    <span className="spinner">⏳</span>
-                    <p>Detecting Faces & Classifying Emotions...</p>
+                    <Loader text="Detecting Faces & Classifying Emotions..." />
                   </div>
                 )}
               </div>
@@ -577,8 +576,7 @@ export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
 
           {loading && !result ? (
             <div className="placeholder-box">
-              <span className="placeholder-icon">⏳</span>
-              <p>Analyzing facial expressions...</p>
+              <Loader text="Analyzing facial expression tensors & probabilities..." />
             </div>
           ) : result ? (
             <div className="metrics-content">

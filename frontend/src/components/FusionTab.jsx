@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { predictMultimodal } from '../services/api';
 import EmotionBarChart from './EmotionBarChart';
+import Loader from './Loader';
 
 const EMOTION_EMOJIS = {
   Angry: '😠',
@@ -223,6 +224,13 @@ export default function FusionTab({
       </div>
 
       {error && <div className="alert-error">{error}</div>}
+
+      {/* Loading Progress State */}
+      {loading && (
+        <div className="card fusion-loading-banner" style={{ textAlign: 'center', padding: '36px 20px' }}>
+          <Loader size="large" text="Executing Decision-Level Late Fusion: Synchronizing Facial Tensors with Acoustic MFCCs..." />
+        </div>
+      )}
 
       {/* Main Results Dashboard */}
       {result && (

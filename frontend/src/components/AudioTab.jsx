@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { predictAudio } from '../services/api';
 import { WavRecorder } from '../utils/wavRecorder';
 import EmotionBarChart from './EmotionBarChart';
+import Loader from './Loader';
 
 export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) {
   const [mode, setMode] = useState('upload'); // 'upload' | 'record' | 'sample'
@@ -361,8 +362,7 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
                 <audio controls src={audioUrl} className="audio-element" />
                 {loading && (
                   <div className="loading-overlay" style={{ marginTop: '16px' }}>
-                    <span className="spinner">⏳</span>
-                    <p>Extracting 40 MFCCs & Classifying Acoustic Emotion...</p>
+                    <Loader text="Extracting 40 MFCCs & Classifying Acoustic Emotion..." />
                   </div>
                 )}
               </div>
@@ -395,8 +395,7 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
 
           {loading && !result ? (
             <div className="placeholder-box">
-              <span className="placeholder-icon">⏳</span>
-              <p>Extracting speech acoustic features...</p>
+              <Loader text="Extracting speech acoustic features & 40 MFCCs..." />
             </div>
           ) : result ? (
             <div className="metrics-content">

@@ -13,6 +13,7 @@ export default function App() {
   const [samples, setSamples] = useState({ faces: [], audios: [] });
   const [backendOnline, setBackendOnline] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('app-theme') || 'dark');
+  const [initialLoading, setInitialLoading] = useState(true);
 
   // Shared inputs for Multimodal tab
   const [multimodalFace, setMultimodalFace] = useState(null);
@@ -42,6 +43,8 @@ export default function App() {
         setSamples(smp);
       } catch (err) {
         console.error('Failed to load samples:', err);
+      } finally {
+        setInitialLoading(false);
       }
     }
 
@@ -58,6 +61,24 @@ export default function App() {
   const clearHistory = () => {
     setHistory([]);
   };
+
+  if (initialLoading) {
+    return (
+      <div className="app-splash-loader">
+        <div className="splash-content">
+          <div className="splash-logo-wrap">
+            <span className="splash-logo">🎭</span>
+            <div className="splash-spinner-ring" />
+          </div>
+          <h2 className="splash-title">AffectSense AI</h2>
+          <p className="splash-subtitle">Initializing Neural Emotion Recognition Architecture...</p>
+          <div className="splash-progress-track">
+            <div className="splash-progress-bar" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app-layout">
