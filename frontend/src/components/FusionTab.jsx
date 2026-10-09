@@ -44,6 +44,12 @@ const PRESET_SCENARIOS = [
     face: 'surprise_test.jpg',
     audio: 'surprise_test.wav',
   },
+  {
+    name: '🤢 Revulsion / Disgust',
+    desc: 'Congruent: Wrinkled Nose + Disgusted Tone',
+    face: 'disgust_test.jpg',
+    audio: 'disgust_test.wav',
+  },
 ];
 
 export default function FusionTab({
