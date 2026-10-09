@@ -16,6 +16,17 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+if hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 import cv2
 import numpy as np
 import uvicorn
@@ -84,15 +95,15 @@ def startup_event():
     """Initialize ML models at server startup."""
     try:
         get_face_detector()
-        print("✓ FacialEmotionDetector initialized successfully.")
+        print("[OK] FacialEmotionDetector initialized successfully.")
     except Exception as err:
-        print(f"⚠ Facial detector initialization warning: {err}")
+        print(f"[WARN] Facial detector initialization warning: {err}")
 
     try:
         get_audio_detector()
-        print("✓ AudioEmotionDetector initialized successfully.")
+        print("[OK] AudioEmotionDetector initialized successfully.")
     except Exception as err:
-        print(f"⚠ Audio detector initialization warning: {err}")
+        print(f"[WARN] Audio detector initialization warning: {err}")
 
 
 # =============================================================================
