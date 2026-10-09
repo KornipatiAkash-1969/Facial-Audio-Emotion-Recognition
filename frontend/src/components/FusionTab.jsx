@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { predictMultimodal } from '../services/api';
+import React, { useState, useRef, useMemo } from 'react';
+import { predictMultimodal, getApiBase } from '../services/api';
 import EmotionBarChart from './EmotionBarChart';
 import Loader from './Loader';
 
@@ -13,6 +13,39 @@ const EMOTION_EMOJIS = {
   Surprise: '😲',
 };
 
+const PRESET_SCENARIOS = [
+  {
+    name: '😄 Joy Alignment',
+    desc: 'Congruent: Happy Face + Happy Voice',
+    face: 'happy_test.jpg',
+    audio: 'happy_test.wav',
+  },
+  {
+    name: '🎭 Sarcasm / Dissonance',
+    desc: 'Conflict: Smiling Face + Furious Voice',
+    face: 'happy_test.jpg',
+    audio: 'angry_test.wav',
+  },
+  {
+    name: '😠 Anger Alignment',
+    desc: 'Congruent: Furrowed Brow + Harsh Voice',
+    face: 'angry_test.jpg',
+    audio: 'angry_test.wav',
+  },
+  {
+    name: '😢 Sorrow Alignment',
+    desc: 'Congruent: Downturned Lips + Somber Voice',
+    face: 'sad_test.jpg',
+    audio: 'sad_test.wav',
+  },
+  {
+    name: '😲 Shock Alignment',
+    desc: 'Congruent: Wide Eyes + High Pitch Shock',
+    face: 'surprise_test.jpg',
+    audio: 'surprise_test.wav',
+  },
+];
+
 export default function FusionTab({
   samples,
   multimodalFace,
@@ -20,10 +53,14 @@ export default function FusionTab({
   onAddHistory,
 }) {
   const [faceWeight, setFaceWeight] = useState(0.5);
-  const [selectedFaceSample, setSelectedFaceSample] = useState('');
-  const [selectedAudioSample, setSelectedAudioSample] = useState('');
+  // Default to benchmark test samples so fusion is immediately runnable
+  const [selectedFaceSample, setSelectedFaceSample] = useState(() => multimodalFace ? '' : 'happy_test.jpg');
+  const [selectedAudioSample, setSelectedAudioSample] = useState(() => multimodalAudio ? '' : 'happy_test.wav');
   const [uploadedFaceFile, setUploadedFaceFile] = useState(null);
   const [uploadedAudioFile, setUploadedAudioFile] = useState(null);
+  const [sharedFaceOverride, setSharedFaceOverride] = useState(null);
+  const [sharedAudioOverride, setSharedAudioOverride] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -31,43 +68,91 @@ export default function FusionTab({
   const faceFileInputRef = useRef(null);
   const audioFileInputRef = useRef(null);
 
+  // Active inputs resolution with robust priority
   const activeFace =
     uploadedFaceFile?.name ||
-    multimodalFace?.name ||
-    (selectedFaceSample ? selectedFaceSample : null);
+    selectedFaceSample ||
+    (sharedFaceOverride?.name ?? multimodalFace?.name) ||
+    null;
+
   const activeAudio =
     uploadedAudioFile?.name ||
-    multimodalAudio?.name ||
-    (selectedAudioSample ? selectedAudioSample : null);
+    selectedAudioSample ||
+    (sharedAudioOverride?.name ?? multimodalAudio?.name) ||
+    null;
+
+  // Image preview source
+  const facePreviewUrl = useMemo(() => {
+    if (uploadedFaceFile) return URL.createObjectURL(uploadedFaceFile);
+    const effShared = sharedFaceOverride ?? multimodalFace;
+    if (effShared?.base64) return effShared.base64;
+    if (effShared?.file) return URL.createObjectURL(effShared.file);
+    const sampleName = selectedFaceSample || effShared?.sample;
+    if (sampleName) return `${getApiBase()}/media/samples/faces/${sampleName}`;
+    return null;
+  }, [uploadedFaceFile, selectedFaceSample, sharedFaceOverride, multimodalFace]);
+
+  // Audio preview source
+  const audioPreviewUrl = useMemo(() => {
+    if (uploadedAudioFile) return URL.createObjectURL(uploadedAudioFile);
+    const effShared = sharedAudioOverride ?? multimodalAudio;
+    if (effShared?.file) return URL.createObjectURL(effShared.file);
+    const sampleName = selectedAudioSample || effShared?.sample;
+    if (sampleName) return `${getApiBase()}/media/samples/audio/${sampleName}`;
+    return null;
+  }, [uploadedAudioFile, selectedAudioSample, sharedAudioOverride, multimodalAudio]);
+
+  const handleApplyPreset = (preset) => {
+    setUploadedFaceFile(null);
+    setUploadedAudioFile(null);
+    setSharedFaceOverride({ sample: preset.face, name: preset.face });
+    setSharedAudioOverride({ sample: preset.audio, name: preset.audio });
+    setSelectedFaceSample(preset.face);
+    setSelectedAudioSample(preset.audio);
+    setError(null);
+  };
 
   const handleRunFusion = async () => {
     if (!activeFace) {
-      setError('Please select or upload a face input first (via Face Tab, upload button, or sample dropdown).');
+      setError('Please select or upload a face input first (via upload, sample dropdown, or quick scenario).');
       return;
     }
     if (!activeAudio) {
-      setError('Please select or upload a speech audio input first (via Audio Tab, upload button, or sample dropdown).');
+      setError('Please select or upload an audio input first (via upload, sample dropdown, or quick scenario).');
       return;
     }
 
     setLoading(true);
     setError(null);
+
     try {
       const payload = {
         faceWeight,
         audioWeight: 1.0 - faceWeight,
       };
 
-      if (uploadedFaceFile) payload.faceFile = uploadedFaceFile;
-      else if (multimodalFace?.base64) payload.faceBase64 = multimodalFace.base64;
-      else if (multimodalFace?.file) payload.faceFile = multimodalFace.file;
-      else if (selectedFaceSample) payload.faceSample = selectedFaceSample;
-      else if (multimodalFace?.sample) payload.faceSample = multimodalFace.sample;
+      // 1. Resolve Face Payload
+      if (uploadedFaceFile) {
+        payload.faceFile = uploadedFaceFile;
+      } else if (selectedFaceSample) {
+        payload.faceSample = selectedFaceSample;
+      } else {
+        const effFace = sharedFaceOverride ?? multimodalFace;
+        if (effFace?.base64) payload.faceBase64 = effFace.base64;
+        else if (effFace?.file) payload.faceFile = effFace.file;
+        else if (effFace?.sample) payload.faceSample = effFace.sample;
+      }
 
-      if (uploadedAudioFile) payload.audioFile = uploadedAudioFile;
-      else if (multimodalAudio?.file) payload.audioFile = multimodalAudio.file;
-      else if (selectedAudioSample) payload.audioSample = selectedAudioSample;
-      else if (multimodalAudio?.sample) payload.audioSample = multimodalAudio.sample;
+      // 2. Resolve Audio Payload
+      if (uploadedAudioFile) {
+        payload.audioFile = uploadedAudioFile;
+      } else if (selectedAudioSample) {
+        payload.audioSample = selectedAudioSample;
+      } else {
+        const effAudio = sharedAudioOverride ?? multimodalAudio;
+        if (effAudio?.file) payload.audioFile = effAudio.file;
+        else if (effAudio?.sample) payload.audioSample = effAudio.sample;
+      }
 
       const res = await predictMultimodal(payload);
       setResult(res);
@@ -81,7 +166,7 @@ export default function FusionTab({
         });
       }
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Multimodal fusion calculation failed. Ensure local server is running on port 8000.');
     } finally {
       setLoading(false);
     }
@@ -92,17 +177,52 @@ export default function FusionTab({
       {/* Configuration Header Card */}
       <div className="card fusion-cfg-card">
         <h3 className="card-heading">Multimodal Input Feeds & Modality Weighting</h3>
+        <p className="section-desc" style={{ marginBottom: '14px' }}>
+          Simultaneously evaluate visual facial dynamics and acoustic speech prosody using late decision-level Bayesian fusion.
+        </p>
+
+        {/* 1-Click Preset Benchmark Scenarios */}
+        <div style={{ marginBottom: '18px' }}>
+          <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            ⚡ 1-Click Test Scenarios:
+          </span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+            {PRESET_SCENARIOS.map((p) => (
+              <button
+                key={p.name}
+                type="button"
+                className="btn btn-secondary"
+                style={{ fontSize: '12px', padding: '6px 12px' }}
+                title={p.desc}
+                onClick={() => handleApplyPreset(p)}
+              >
+                {p.name}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className="fusion-inputs-grid">
           {/* Face Input Status Card */}
           <div className="input-source-card">
             <span className="source-icon">👤</span>
-            <div className="source-details">
+            <div className="source-details" style={{ width: '100%' }}>
               <strong>Visual Facial Input:</strong>
-              <p className="source-name">
+              <p className="source-name" style={{ wordBreak: 'break-all' }}>
                 {activeFace ? `Active: ${activeFace}` : 'No face selected'}
               </p>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px' }}>
+
+              {facePreviewUrl && (
+                <div style={{ margin: '8px 0', borderRadius: '6px', overflow: 'hidden', maxHeight: '110px', display: 'flex', alignItems: 'center' }}>
+                  <img
+                    src={facePreviewUrl}
+                    alt="Selected Face Preview"
+                    style={{ maxHeight: '110px', maxWidth: '100%', objectFit: 'contain', borderRadius: '6px', border: '1px solid var(--border-color)' }}
+                  />
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px', flexWrap: 'wrap' }}>
                 <input
                   type="file"
                   ref={faceFileInputRef}
@@ -113,11 +233,13 @@ export default function FusionTab({
                     if (f) {
                       setUploadedFaceFile(f);
                       setSelectedFaceSample('');
+                      setSharedFaceOverride(null);
                     }
                     e.target.value = '';
                   }}
                 />
                 <button
+                  type="button"
                   className="btn btn-secondary"
                   style={{ fontSize: '11px', padding: '5px 10px' }}
                   onClick={() => faceFileInputRef.current?.click()}
@@ -126,11 +248,12 @@ export default function FusionTab({
                 </button>
                 <select
                   className="select-dropdown-small"
-                  style={{ marginTop: 0 }}
+                  style={{ marginTop: 0, flex: 1, minWidth: '130px' }}
                   value={selectedFaceSample}
                   onChange={(e) => {
                     setSelectedFaceSample(e.target.value);
                     setUploadedFaceFile(null);
+                    setSharedFaceOverride(null);
                   }}
                 >
                   <option value="">-- Or Sample Face --</option>
@@ -147,12 +270,19 @@ export default function FusionTab({
           {/* Audio Input Status Card */}
           <div className="input-source-card">
             <span className="source-icon">🎙️</span>
-            <div className="source-details">
+            <div className="source-details" style={{ width: '100%' }}>
               <strong>Acoustic Speech Input:</strong>
-              <p className="source-name">
+              <p className="source-name" style={{ wordBreak: 'break-all' }}>
                 {activeAudio ? `Active: ${activeAudio}` : 'No audio selected'}
               </p>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px' }}>
+
+              {audioPreviewUrl && (
+                <div style={{ margin: '8px 0' }}>
+                  <audio controls src={audioPreviewUrl} style={{ width: '100%', height: '36px' }} />
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px', flexWrap: 'wrap' }}>
                 <input
                   type="file"
                   ref={audioFileInputRef}
@@ -163,11 +293,13 @@ export default function FusionTab({
                     if (f) {
                       setUploadedAudioFile(f);
                       setSelectedAudioSample('');
+                      setSharedAudioOverride(null);
                     }
                     e.target.value = '';
                   }}
                 />
                 <button
+                  type="button"
                   className="btn btn-secondary"
                   style={{ fontSize: '11px', padding: '5px 10px' }}
                   onClick={() => audioFileInputRef.current?.click()}
@@ -176,11 +308,12 @@ export default function FusionTab({
                 </button>
                 <select
                   className="select-dropdown-small"
-                  style={{ marginTop: 0 }}
+                  style={{ marginTop: 0, flex: 1, minWidth: '130px' }}
                   value={selectedAudioSample}
                   onChange={(e) => {
                     setSelectedAudioSample(e.target.value);
                     setUploadedAudioFile(null);
+                    setSharedAudioOverride(null);
                   }}
                 >
                   <option value="">-- Or Sample Audio --</option>
@@ -196,7 +329,7 @@ export default function FusionTab({
         </div>
 
         {/* Weighting Slider & Trigger */}
-        <div className="slider-action-row">
+        <div className="slider-action-row" style={{ marginTop: '20px' }}>
           <div className="slider-container">
             <div className="slider-label-row">
               <span>Face Weight: {(faceWeight * 100).toFixed(0)}%</span>
@@ -214,6 +347,7 @@ export default function FusionTab({
           </div>
 
           <button
+            type="button"
             className="btn btn-primary btn-large"
             onClick={handleRunFusion}
             disabled={loading}
@@ -270,7 +404,7 @@ export default function FusionTab({
             </div>
           </div>
 
-          {/* Modality Breakdown Cards */}
+          {/* Modality Breakdown Cards with Visual Face Box and Audio Player */}
           <div className="modality-breakdown-grid">
             <div className="breakdown-card visual-card">
               <span className="hud-corner hud-tl" />
@@ -280,6 +414,17 @@ export default function FusionTab({
                 <span className="breakdown-emoji">{EMOTION_EMOJIS[result.face.emotion] || '👤'}</span>
               </div>
               <h3>{result.face.emotion}</h3>
+
+              {result.annotated_face_image && (
+                <div style={{ margin: '10px 0', borderRadius: '8px', overflow: 'hidden', textAlign: 'center' }}>
+                  <img
+                    src={result.annotated_face_image}
+                    alt="Annotated Detected Face"
+                    style={{ maxWidth: '100%', maxHeight: '180px', objectFit: 'contain', borderRadius: '6px' }}
+                  />
+                </div>
+              )}
+
               <div className="breakdown-metric-row">
                 <span>Confidence</span>
                 <strong>{(result.face.confidence * 100).toFixed(1)}%</strong>
@@ -301,6 +446,13 @@ export default function FusionTab({
                 <span className="breakdown-emoji">{EMOTION_EMOJIS[result.audio.emotion] || '🎙️'}</span>
               </div>
               <h3>{result.audio.emotion}</h3>
+
+              {audioPreviewUrl && (
+                <div style={{ margin: '10px 0' }}>
+                  <audio controls src={audioPreviewUrl} style={{ width: '100%', height: '36px' }} />
+                </div>
+              )}
+
               <div className="breakdown-metric-row">
                 <span>Confidence</span>
                 <strong>{(result.audio.confidence * 100).toFixed(1)}%</strong>

@@ -345,7 +345,14 @@ async def predict_multimodal(
         if face_base64:
             face_frame = decode_base64_image(face_base64)
         elif face_sample:
-            target_face = FACE_SAMPLES_DIR / face_sample
+            clean_name = os.path.basename(face_sample)
+            target_face = FACE_SAMPLES_DIR / clean_name
+            if not target_face.exists():
+                alt = PROJECT_ROOT / "test_images" / clean_name
+                if alt.exists():
+                    target_face = alt
+            if not target_face.exists():
+                raise FileNotFoundError(f"Face sample '{clean_name}' not found.")
             face_frame = f_det.read_image(target_face)
         elif face_file:
             content = await face_file.read()
@@ -361,7 +368,14 @@ async def predict_multimodal(
     # 2. Process Audio
     try:
         if audio_sample:
-            target_audio = AUDIO_SAMPLES_DIR / audio_sample
+            clean_name = os.path.basename(audio_sample)
+            target_audio = AUDIO_SAMPLES_DIR / clean_name
+            if not target_audio.exists():
+                alt = PROJECT_ROOT / "test_audio" / clean_name
+                if alt.exists():
+                    target_audio = alt
+            if not target_audio.exists():
+                raise FileNotFoundError(f"Audio sample '{clean_name}' not found.")
             audio_res = a_det.predict(target_audio)
         elif audio_file:
             suffix = Path(audio_file.filename).suffix if audio_file.filename else ".wav"
