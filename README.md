@@ -147,7 +147,7 @@ Human communication relies on both facial expressions and tone of voice. This en
 ## 📁 Project Structure
 
 ```
-Multimodal-Emotion-Recognition/
+facial-audio-emotion-recognition/
 ├── main.py                    # Primary Desktop GUI application launcher
 ├── app.py                     # Launcher alias (redirects to main.py)
 ├── cli.py                     # Command-line interface for terminal/batch scripts
@@ -192,7 +192,7 @@ Multimodal-Emotion-Recognition/
 Install all required libraries via pip:
 
 ```bash
-cd Multimodal-Emotion-Recognition
+cd facial-audio-emotion-recognition
 pip install -r requirements.txt
 ```
 
