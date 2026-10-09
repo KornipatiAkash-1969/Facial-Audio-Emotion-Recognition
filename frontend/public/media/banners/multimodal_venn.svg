@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="100%" height="100%" style="background:#0b0f19; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <radialGradient id="visualGlow" cx="35%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.02"/>
+    </radialGradient>
+    <radialGradient id="acousticGlow" cx="65%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.02"/>
+    </radialGradient>
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.05"/>
+    </radialGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Background Grid lines -->
+  <g opacity="0.08" stroke="#94a3b8" stroke-width="1">
+    <path d="M 0,65 L 900,65 M 0,130 L 900,130 M 0,195 L 900,195 M 0,260 L 900,260 M 0,325 L 900,325 M 0,390 L 900,390 M 0,455 L 900,455" />
+    <path d="M 100,0 L 100,520 M 200,0 L 200,520 M 300,0 L 300,520 M 400,0 L 400,520 M 500,0 L 500,520 M 600,0 L 600,520 M 700,0 L 700,520 M 800,0 L 800,520" />
+  </g>
+
+  <!-- Header Banner -->
+  <text x="450" y="42" text-anchor="middle" font-size="22" font-weight="700" fill="#f8fafc" letter-spacing="1">
+    AFFECTSENSE AI • MULTIMODAL AFFECTIVE VENN ARCHITECTURE
+  </text>
+  <text x="450" y="66" text-anchor="middle" font-size="13" font-weight="400" fill="#94a3b8">
+    Dual-Stream Cross-Modal Interaction &amp; Decision-Level Fusion Synergy
+  </text>
+
+  <!-- Venn Circles -->
+  <!-- Left Circle: Visual Modality -->
+  <circle cx="330" cy="275" r="210" fill="url(#visualGlow)" stroke="#06b6d4" stroke-width="2.5" stroke-dasharray="6,2" filter="url(#shadow)"/>
+  
+  <!-- Right Circle: Acoustic Modality -->
+  <circle cx="570" cy="275" r="210" fill="url(#acousticGlow)" stroke="#10b981" stroke-width="2.5" stroke-dasharray="6,2" filter="url(#shadow)"/>
+
+  <!-- Intersection Glow Fill -->
+  <path d="M 450,113 A 210,210 0 0,1 450,437 A 210,210 0 0,1 450,113 Z" fill="url(#centerGlow)" stroke="#a855f7" stroke-width="3" filter="url(#shadow)"/>
+
+  <!-- LEFT SET CONTENT: Visual Modality -->
+  <g transform="translate(140, 150)">
+    <rect x="-10" y="0" width="180" height="32" rx="6" fill="#083344" stroke="#06b6d4" stroke-width="1.2"/>
+    <text x="80" y="21" text-anchor="middle" font-size="13" font-weight="700" fill="#38bdf8">👁️ VISUAL MODALITY</text>
+    
+    <text x="0" y="55" font-size="11" font-weight="600" fill="#7dd3fc">Facial Expression (FACS)</text>
+    <text x="0" y="78" font-size="11.5" fill="#e2e8f0">• Micro-muscle activations</text>
+    <text x="0" y="98" font-size="11" fill="#94a3b8" style="padding-left:12px;">  (AU 4, AU 9, AU 10, AU 12)</text>
+    <text x="0" y="122" font-size="11.5" fill="#e2e8f0">• Brow furrowing &amp; eye widen</text>
+    <text x="0" y="144" font-size="11.5" fill="#e2e8f0">• Nasolabial fold wrinkling</text>
+    <text x="0" y="166" font-size="11.5" fill="#e2e8f0">• Zygomatic smile elevation</text>
+    
+    <!-- Vulnerability box -->
+    <rect x="-5" y="190" width="175" height="48" rx="5" fill="#1e1b4b" stroke="#f43f5e" stroke-width="1" stroke-dasharray="3,2"/>
+    <text x="82" y="208" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fda4af">⚠️ MODALITY LIMIT</text>
+    <text x="82" y="226" text-anchor="middle" font-size="10" fill="#fecdd3">Social smile masking (feignable)</text>
+  </g>
+
+  <!-- RIGHT SET CONTENT: Acoustic Modality -->
+  <g transform="translate(590, 150)">
+    <rect x="-10" y="0" width="180" height="32" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1.2"/>
+    <text x="80" y="21" text-anchor="middle" font-size="13" font-weight="700" fill="#34d399">🎙️ ACOUSTIC MODALITY</text>
+    
+    <text x="0" y="55" font-size="11" font-weight="600" fill="#6ee7b7">Speech Prosody &amp; Arousal</text>
+    <text x="0" y="78" font-size="11.5" fill="#e2e8f0">• Fundamental Pitch (F0)</text>
+    <text x="0" y="98" font-size="11" fill="#94a3b8">  harmonic variations &amp; glides</text>
+    <text x="0" y="122" font-size="11.5" fill="#e2e8f0">• 40-Dimensional MFCCs</text>
+    <text x="0" y="144" font-size="11.5" fill="#e2e8f0">• Harmonic-to-Noise Ratio</text>
+    <text x="0" y="166" font-size="11.5" fill="#e2e8f0">• Vocal jitter &amp; shimmer</text>
+    
+    <!-- Strength box -->
+    <rect x="-5" y="190" width="175" height="48" rx="5" fill="#064e3b" stroke="#10b981" stroke-width="1" stroke-dasharray="3,2"/>
+    <text x="82" y="208" text-anchor="middle" font-size="10.5" font-weight="700" fill="#a7f3d0">⚡ MODALITY STRENGTH</text>
+    <text x="82" y="226" text-anchor="middle" font-size="10" fill="#d1fae5">Autonomic arousal (hard to fake)</text>
+  </g>
+
+  <!-- CENTER INTERSECTION: Multimodal Late Fusion -->
+  <g transform="translate(370, 145)">
+    <rect x="0" y="0" width="160" height="34" rx="6" fill="#3b0764" stroke="#c084fc" stroke-width="1.5"/>
+    <text x="80" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#f3e8ff" letter-spacing="0.5">🎯 MULTIMODAL FUSION</text>
+
+    <text x="80" y="58" text-anchor="middle" font-size="11" font-weight="700" fill="#c084fc">MUTUAL GROUND TRUTH</text>
+    
+    <rect x="5" y="75" width="150" height="46" rx="5" fill="#18181b" stroke="#3b82f6" stroke-width="1"/>
+    <text x="80" y="93" text-anchor="middle" font-size="10.5" font-weight="700" fill="#93c5fd">Affective Congruence</text>
+    <text x="80" y="109" text-anchor="middle" font-size="9.5" fill="#bfdbfe">Sc ≥ 0.65 (Synergy Match)</text>
+
+    <rect x="5" y="130" width="150" height="46" rx="5" fill="#18181b" stroke="#f59e0b" stroke-width="1"/>
+    <text x="80" y="148" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fcd34d">Conflict &amp; Sarcasm</text>
+    <text x="80" y="164" text-anchor="middle" font-size="9.5" fill="#fde68a">Sc &lt; 0.65 (Masking Alert)</text>
+
+    <rect x="5" y="185" width="150" height="46" rx="5" fill="#18181b" stroke="#a855f7" stroke-width="1"/>
+    <text x="80" y="203" text-anchor="middle" font-size="10.5" font-weight="700" fill="#e9d5ff">Decision Late Fusion</text>
+    <text x="80" y="219" text-anchor="middle" font-size="9.5" fill="#f3e8ff">Pfused = wf·Pf + wa·Pa</text>
+  </g>
+
+  <!-- Footer Banner -->
+  <rect x="180" y="475" width="540" height="32" rx="16" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+  <text x="450" y="496" text-anchor="middle" font-size="12" font-weight="600" fill="#cbd5e1">
+    🚀 Resolves Ambiguity • Detects Sarcasm &amp; Irony • Validates Emotional Authenticity
+  </text>
+</svg>

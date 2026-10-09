@@ -46,8 +46,11 @@ An enterprise-grade, dual-modality affective computing platform combining **Comp
 
 ## 📖 Table of Contents
 1. [Overview & Highlights](#-overview--highlights)
-2. [Updated System Architecture Flowchart](#-system-architecture-flowchart)
+2. [System Architecture Flowchart](#-system-architecture-flowchart)
 3. [Venn Diagrams & Multimodal Theory](#-venn-diagrams--multimodal-theory)
+   - [A. Multimodal Affective Venn Architecture](#a-multimodal-affective-venn-architecture)
+   - [B. Cross-Modal Interaction Flowchart](#b-cross-modal-interaction-flowchart)
+   - [C. State Resolution & Sarcasm Matrix](#c-state-resolution--sarcasm-matrix)
 4. [How It Works (Step-by-Step)](#-how-it-works-step-by-step)
    - [A. Visual Facial Modality Pipeline & Bayesian Calibration](#a-visual-facial-modality-pipeline--bayesian-calibration)
    - [B. Acoustic Vocal Modality Pipeline & 5× Data Augmentation](#b-acoustic-vocal-modality-pipeline--5-data-augmentation)
@@ -82,118 +85,143 @@ An enterprise-grade, dual-modality affective computing platform combining **Comp
 
 ```mermaid
 flowchart TD
-    %% Input Sources
-    subgraph S1["1. Dual Input Modality Streams"]
-        direction TB
-        CAM["📷 Visual Input\n• Live Browser Webcam Canvas\n• Uploaded Image (JPEG/PNG)\n• Curated Benchmark Gallery"]
-        MIC["🎙️ Acoustic Input\n• Browser Microphone WAV\n• Uploaded Audio (WAV/MP3)\n• TESS Benchmark Audio"]
+    %% Input Layer
+    subgraph Inputs ["1. Dual Ingestion Modality Streams"]
+        IMG["📷 Visual Input Stream<br/>• Live Webcam Video Canvas (base64)<br/>• High-Resolution Image Upload<br/>• Benchmark Face Gallery"]
+        AUD["🎙️ Acoustic Input Stream<br/>• Microphone Audio (PCM 16-bit WAV)<br/>• Recorded Audio File Upload<br/>• Benchmark Speech Gallery"]
     end
 
-    %% Visual Pipeline
-    subgraph S2["2. Computer Vision Facial Pipeline"]
-        direction TB
-        CAM --> HAAR["OpenCV Haar Cascade\n(Frontal Face Localization\nScale 1.3, MinNeighbors 5)"]
-        HAAR --> CROP["Face Bounding Box Crop\n(Fallback: Central Crop)"]
-        CROP --> PREPROC["Preprocessing & Area Resizing\n• 48x48 Grayscale (INTER_AREA)\n• Pixel Intensity Rescaling [0, 1]"]
-        PREPROC --> CNN["4-Block Deep CNN Architecture\n• Conv2D(32) + Conv2D(64) + MaxPool + Drop(0.1)\n• Conv2D(128) + MaxPool + Drop(0.1)\n• Conv2D(256) + MaxPool + Drop(0.1)\n• Dense(512) + Drop(0.2) + Softmax(7)"]
-        CNN --> CALIB["Bayesian Class-Prior Calibration\n• Corrects 1:9 FER Disgust Imbalance\n• Calibrated Softmax Normalization (α=0.05)"]
-        CALIB --> P_FACE["7D Visual Probability Vector P_face\n[Angry, Disgust, Fear, Happy, Neutral, Sad, Surprise]"]
+    %% Visual Facial Pipeline
+    subgraph VisionPipeline ["2. Computer Vision Facial Recognition Pipeline"]
+        HAAR["OpenCV Haar Cascade Classifier<br/>(Frontal Face Detection • Scale: 1.3 • MinNeighbors: 5)"]
+        CROP["Face Localization & Bounding Box Crop<br/>(Fallback: Central Frame Crop)"]
+        PREPROC["Image Preprocessing & Resizing<br/>48×48 Grayscale • cv2.INTER_AREA • Rescaled [0, 1]"]
+        CNN["4-Block Deep CNN Architecture<br/>Conv2D(32/64/128/256) + MaxPool + Dropout + Dense(512)"]
+        CALIB["Bayesian Class-Prior Calibration<br/>Empirical Weighting (α=0.05) Resolves Disgust Imbalance"]
+        PFACE["7D Facial Probability Vector P_face<br/>[Angry, Disgust, Fear, Happy, Neutral, Sad, Surprise]"]
+
+        IMG --> HAAR --> CROP --> PREPROC --> CNN --> CALIB --> PFACE
     end
 
-    %% Acoustic Pipeline
-    subgraph S3["3. Acoustic Signal Processing Pipeline"]
-        direction TB
-        MIC --> AUDIO_IN["Audio Ingestion & Resampling\n(22,050 Hz Mono PCM Normalization)"]
-        AUDIO_IN --> FEAT["Acoustic Feature Extraction (Librosa)\n• 40 Mel-Frequency Cepstral Coefficients (MFCCs)\n• Temporal Mean Pooling Vector (40D)"]
-        FEAT --> SCALER["StandardScaler Z-Score Normalization\n(Pre-fitted on 14,000 Augmented Vectors)"]
-        SCALER --> MLP["Acoustic MLP Classifier\n(Trained with 5x Data Augmentation:\nNoise, Pitch ±1.5 Semitones, Tempo Stretch)"]
-        MLP --> P_AUDIO["7D Acoustic Probability Vector P_audio\n[Angry, Disgust, Fear, Happy, Neutral, Sad, Surprise]"]
+    %% Acoustic Audio Pipeline
+    subgraph AudioPipeline ["3. Acoustic Speech Emotion Pipeline"]
+        RESAMPLE["Audio Standardization & Resampling<br/>22,050 Hz Mono PCM • Silence Trimming"]
+        MFCC["Librosa Acoustic Feature Extraction<br/>40 Mel-Frequency Cepstral Coefficients (MFCCs)"]
+        SCALER["StandardScaler Z-Score Normalization<br/>Standardized against 14,000 Augmented Vectors"]
+        MLP["Acoustic MLP Neural Classifier<br/>Trained on 5× Augmented TESS Dataset (99.75% Accuracy)"]
+        PAUDIO["7D Acoustic Probability Vector P_audio<br/>[Angry, Disgust, Fear, Happy, Neutral, Sad, Surprise]"]
+
+        AUD --> RESAMPLE --> MFCC --> SCALER --> MLP --> PAUDIO
     end
 
-    %% Fusion Engine
-    subgraph S4["4. Decision-Level Multimodal Late Fusion Core"]
-        direction TB
-        P_FACE --> FUSE["Linear Weighted Probability Fusion\nP_fused = w_face * P_face + w_audio * P_audio\n(Dynamic Weight Slider: 0.0 - 1.0)"]
-        P_AUDIO --> FUSE
-        P_FACE --> COS["High-Dimensional Cosine Congruence\nS_c = cos(P_face, P_audio) = (P_f • P_a) / (||P_f|| ||P_a||)"]
-        P_AUDIO --> COS
-        FUSE --> TOP["Top Fused Emotion & Confidence Score\nMax argmax(P_fused)"]
-        COS --> DIAG["Affective Diagnostic Engine\n• S_c >= 0.65: Congruent Synergistic Match\n• S_c < 0.65: Dissonance / Masking / Sarcasm Alert"]
+    %% Multimodal Late Fusion
+    subgraph FusionEngine ["4. Decision-Level Multimodal Late Fusion Core"]
+        FUSE["Linear Probability Fusion<br/>P_fused = w_face · P_face + w_audio · P_audio<br/>(Configurable Weight Slider: 0.0 – 1.0)"]
+        SIM["High-Dimensional Cosine Congruence<br/>S_c = cos(P_face, P_audio) = (P_face • P_audio) / (||P_face|| ||P_audio||)"]
+        DIAG["Affective Conflict & Sarcasm Diagnostic<br/>• S_c ≥ 0.65: Synergistic Match<br/>• S_c &lt; 0.65: Masking / Incongruence Alert"]
+        RESULT["Final Emotion Decision & Confidence<br/>Top Predicted Emotion + Radar/Bar Distributions"]
+
+        PFACE --> FUSE
+        PAUDIO --> FUSE
+        PFACE --> SIM
+        PAUDIO --> SIM
+        FUSE --> RESULT
+        SIM --> DIAG
     end
 
     %% Presentation Layer
-    subgraph S5["5. Presentation & Delivery Layer"]
-        direction TB
-        TOP --> UI["React 19 + Vite Obsidian/Cyberpunk UI\n• Live Camera Canvas HUD & Face Box Overlay\n• Audio Waveform Visualizer & Player\n• Interactive Probability Distribution Bars\n• 6 1-Click Benchmark Scenario Presets\n• Session History Export"]
+    subgraph Presentation ["5. Interactive User Interface & API Layer"]
+        UI["React 19 Cyberpunk HUD Dashboard<br/>• Live Webcam Video Canvas & HUD Reticles<br/>• Audio Waveform Visualizer & Recording Controls<br/>• 6 1-Click Multimodal Preset Scenarios<br/>• Real-Time Probability Bar & Radar Charts"]
+        API["FastAPI REST Endpoints (port 8000)<br/>• POST /api/predict/face<br/>• POST /api/predict/audio<br/>• POST /api/predict/multimodal<br/>• Interactive OpenAPI Docs (/docs)"]
+
+        RESULT --> UI
         DIAG --> UI
-        TOP --> API["FastAPI REST Endpoints\n• /api/predict/face\n• /api/predict/audio\n• /api/predict/multimodal\n• OpenAPI Swagger (/docs)"]
+        RESULT --> API
+        DIAG --> API
     end
 
     %% Styling
-    classDef inputStyle fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#f8fafc;
-    classDef visionStyle fill:#0f172a,stroke:#06b6d4,stroke-width:2px,color:#f8fafc;
-    classDef audioStyle fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#f8fafc;
-    classDef fusionStyle fill:#1e1b4b,stroke:#8b5cf6,stroke-width:2px,color:#f8fafc;
-    classDef uiStyle fill:#18181b,stroke:#f59e0b,stroke-width:2px,color:#f8fafc;
+    classDef inputNode fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#f8fafc;
+    classDef visionNode fill:#0f172a,stroke:#06b6d4,stroke-width:2px,color:#f8fafc;
+    classDef audioNode fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#f8fafc;
+    classDef fusionNode fill:#1e1b4b,stroke:#8b5cf6,stroke-width:2px,color:#f8fafc;
+    classDef uiNode fill:#18181b,stroke:#f59e0b,stroke-width:2px,color:#f8fafc;
 
-    class CAM,MIC inputStyle;
-    class HAAR,CROP,PREPROC,CNN,CALIB,P_FACE visionStyle;
-    class AUDIO_IN,FEAT,SCALER,MLP,P_AUDIO audioStyle;
-    class FUSE,COS,TOP,DIAG fusionStyle;
-    class UI,API uiStyle;
+    class IMG,AUD inputNode;
+    class HAAR,CROP,PREPROC,CNN,CALIB,PFACE visionNode;
+    class RESAMPLE,MFCC,SCALER,MLP,PAUDIO audioNode;
+    class FUSE,SIM,DIAG,RESULT fusionNode;
+    class UI,API uiNode;
 ```
 
 ---
 
 ## 📊 Venn Diagrams & Multimodal Theory
 
-### 1. The Multimodal Affective Venn Diagram
+### A. Multimodal Affective Venn Architecture
 
-Visual cues capture transient muscle activations (FACS action units), while vocal cues capture autonomic nervous arousal (pitch, jitter, shimmer, MFCCs). Together, they disambiguate human emotion:
+The core premise of AffectSense AI is that **neither facial expressions nor vocal cues alone reveal the complete emotional state**. Visual cues capture transient micro-muscle activations (FACS action units), while vocal cues capture physiological autonomic arousal (pitch, jitter, shimmer, MFCCs).
 
-```
-          ┌───────────────────────────┐         ┌───────────────────────────┐
-          │      VISUAL MODALITY      │         │     ACOUSTIC MODALITY     │
-          │   (Facial Expression)     │         │       (Vocal Prosody)     │
-          │                           │         │                           │
-          │ • Micro-muscle activations│         │ • Fundamental Pitch (F0)  │
-          │ • Eyebrow furrowing / lift│    ┌────┴────┐ • Harmonic-to-Noise  │
-          │ • Mouth shape & smiling   │    │ AFFECT  │ • Spectral Energy & Flux│
-          │ • Nasolabial folds        │────┤ CONGRU- ├────│ • 40 Mel-Frequency  │
-          │ • Eye widening / squinting│    │  ENCE   │   Cepstral Coefficients │
-          │ • Social smile masking    │    └────┬────┘ • Speech cadence/tempo   │
-          │   (can be feigned)        │         │ • High arousal indicators │
-          │                           │         │   (difficult to feign)    │
-          └───────────────────────────┘         └───────────────────────────┘
-                                       ▲       ▲
-                                       │       │
-                                 ┌─────┴───────┴──────┐
-                                 │   THE INTERSECTION │
-                                 │  MULTIMODAL FUSION │
-                                 ├────────────────────┤
-                                 │ 1. Mutual Truth    │
-                                 │ 2. Disambiguation  │
-                                 │ 3. Sarcasm / Irony │
-                                 │ 4. Masking Alert   │
-                                 └────────────────────┘
+![Multimodal Affective Venn Diagram](assets/banners/multimodal_venn.svg)
+
+---
+
+### B. Cross-Modal Interaction Flowchart
+
+The following flowchart illustrates how the two independent perceptual channels interact to yield ground truth emotion and flag deceptive or conflicting affective states:
+
+```mermaid
+flowchart LR
+    subgraph VisualDomain ["👁️ Visual Modality (Facial Expression)"]
+        direction TB
+        V1["FACS Action Unit Activations<br/>• AU 4: Brow Lowerer (Anger)<br/>• AU 12: Zygomatic Pull (Joy)<br/>• AU 9: Nose Wrinkler (Disgust)"]
+        V2["Micro-Expression Clues<br/>• Transient eye widening & gazes<br/>• Nasolabial fold curvature"]
+        V3["⚠️ Modality Limitation<br/>Social smile masking can be consciously faked"]
+    end
+
+    subgraph FusionIntersection ["🎯 Multimodal Late Fusion Intersection"]
+        direction TB
+        I1["⚖️ Linear Probability Fusion<br/>P_fused = w_face · P_face + w_audio · P_audio"]
+        I2["🔍 Cosine Affective Congruence (S_c)<br/>S_c = cos(P_face, P_audio)"]
+        I3["✅ Synergistic Match (S_c ≥ 0.65)<br/>Visual & vocal channels reinforce true emotion"]
+        I4["🎭 Conflict / Sarcasm Alert (S_c &lt; 0.65)<br/>Incongruence reveals feigned masking or irony"]
+    end
+
+    subgraph AcousticDomain ["🎙️ Acoustic Modality (Vocal Prosody)"]
+        direction TB
+        A1["Prosodic Features (F0 Pitch)<br/>• Fundamental frequency variance<br/>• Upward & downward pitch glides"]
+        A2["Spectral Features (40 MFCCs)<br/>• Harmonic-to-Noise Ratio (HNR)<br/>• Spectral centroid & flux"]
+        A3["⚡ Modality Strength<br/>Autonomic vocal arousal is involuntary & hard to fake"]
+    end
+
+    VisualDomain --> FusionIntersection
+    AcousticDomain --> FusionIntersection
+
+    %% Styling
+    classDef vDomain fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#f8fafc;
+    classDef aDomain fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#f8fafc;
+    classDef iDomain fill:#2e1065,stroke:#a855f7,stroke-width:2px,color:#f8fafc;
+
+    class VisualDomain,V1,V2,V3 vDomain;
+    class AcousticDomain,A1,A2,A3 aDomain;
+    class FusionIntersection,I1,I2,I3,I4 iDomain;
 ```
 
-### 2. State Resolution Matrix
+---
 
-```
-       ACOUSTIC SPEECH
-         ▲
-         │        [ CONFLICT: PASSIVE-AGGRESSIVE ]             [ SYNERGISTIC MATCH ]
-   Angry │        Smiling face + Furious voice                 Scowling face + Furious voice
-         │        --> Sarcasm / Hostility Detected             --> 100% High-Confidence Anger
-         │
-         │        [ BASELINE NEUTRAL ]                         [ SURPRISE ALIGNMENT ]
- Neutral │        Calm face + Monotone speech                  Wide eyes + Elevated vocal pitch
-         │        --> 100% Composed Baseline                   --> Genuine Astonishment
-         │
-         └─────────────────────────────────────────────────────────────────────────────►
-                  Neutral                                      Happy           VISUAL FACE
-```
+### C. State Resolution & Sarcasm Matrix
+
+When visual and vocal cues disagree, the late fusion engine utilizes the high-dimensional Cosine Congruence score ($S_c$) to differentiate between genuine emotional states and behavioral masking:
+
+| Visual Modality | Acoustic Modality | Congruence ($S_c$) | Diagnostic Classification | Behavioral & Psychological Interpretation |
+| :---: | :---: | :---: | :---: | :--- |
+| **😄 Happy** | **😄 Happy** | **$0.98$ (High)** | **Synergistic Alignment** | **Authentic Joy**: Smiling face reinforced by upbeat melodic vocal tone. |
+| **😠 Angry** | **😠 Angry** | **$0.96$ (High)** | **Synergistic Alignment** | **Unambiguous Anger**: Furrowed brow matching harsh, high-energy acoustic jitter. |
+| **😄 Happy** | **😠 Angry** | **$0.18$ (Conflict)** | **Sarcasm / Aggression Alert** | **Passive-Aggressive / Sarcastic**: Feigned social smile while vocal prosody carries rage or contempt. |
+| **😐 Neutral** | **😢 Sad** | **$0.31$ (Conflict)** | **Masked Melancholy** | **Suppressed Grief**: Composed facial exterior attempting to disguise vocal tremor and depression. |
+| **😲 Surprise** | **😨 Fear** | **$0.55$ (Dissonance)**| **Startle Response** | **Acute Shock**: Sudden eye widening accompanied by vocal constriction bordering on panic. |
+| **🤢 Disgust** | **🤢 Disgust** | **$0.97$ (High)** | **Synergistic Alignment** | **Authentic Revulsion**: Wrinkled nasal bridge confirmed by low-frequency guttural vocalization. |
+| **😐 Neutral** | **😐 Neutral** | **$0.95$ (High)** | **Baseline Composure** | **Composed Baseline**: Emotionally balanced face and steady, unagitated vocal cadence. |
 
 ---
 
@@ -388,6 +416,8 @@ The Multimodal Fusion tab provides 6 instant 1-click preset scenarios:
 ```
 Facial-Audio-Emotion-Recognition/
 ├── assets/                                 # Static assets and preloaded samples
+│   ├── banners/                            # High-resolution architectural graphics
+│   │   └── multimodal_venn.svg             # Multimodal Affective Venn diagram vector
 │   ├── emojis/                             # Emotion avatar graphics
 │   └── samples/
 │       ├── audio/                          # TESS .wav audio benchmark samples
