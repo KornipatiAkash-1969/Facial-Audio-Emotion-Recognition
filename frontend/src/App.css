@@ -1,6 +1,6 @@
 /* ==========================================================================
    AffectSense AI - Next-Gen Futuristic Cyber-Glassmorphism Stylesheet
-   Ultra-Modern Dark Theme with Ambient Gradients, Frosted Glass & Neon Accents
+   Fully Responsive (Desktop, Laptop, Tablet, Mobile Landscape, Mobile Portrait)
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -50,8 +50,6 @@
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.4), 0 0 1px 1px rgba(255, 255, 255, 0.05) inset;
   --shadow-lg: 0 16px 40px -8px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.08) inset;
-  --shadow-glow-indigo: 0 0 25px rgba(99, 102, 241, 0.25);
-  --shadow-glow-cyan: 0 0 25px rgba(6, 182, 212, 0.25);
   
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -73,10 +71,10 @@ html {
 body {
   background-color: var(--bg-space);
   background-image: 
-    radial-gradient(circle at 10% 15%, rgba(99, 102, 241, 0.07) 0%, transparent 45%),
-    radial-gradient(circle at 85% 20%, rgba(6, 182, 212, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 10% 15%, rgba(99, 102, 241, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(6, 182, 212, 0.07) 0%, transparent 45%),
     radial-gradient(circle at 50% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 80% 90%, rgba(16, 185, 129, 0.04) 0%, transparent 40%);
+    radial-gradient(circle at 80% 90%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
   background-attachment: fixed;
   color: var(--text-main);
   font-family: var(--font-family);
@@ -112,7 +110,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 14px 32px;
-  background: rgba(10, 15, 29, 0.82);
+  background: rgba(10, 15, 29, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-glass);
@@ -120,6 +118,7 @@ body {
   top: 0;
   z-index: 100;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  transition: padding 0.2s ease;
 }
 
 .nav-brand {
@@ -140,6 +139,7 @@ body {
   border-radius: var(--radius-md);
   box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  flex-shrink: 0;
 }
 
 .brand-logo:hover {
@@ -165,7 +165,7 @@ body {
   margin-top: 1px;
 }
 
-/* Nav Pills Group */
+/* Nav Tabs Segmented Group */
 .nav-tabs {
   display: flex;
   gap: 6px;
@@ -190,7 +190,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  position: relative;
+  white-space: nowrap;
 }
 
 .tab-btn:hover {
@@ -226,6 +226,7 @@ body {
   padding: 6px 14px;
   border-radius: 20px;
   border: 1px solid var(--border-glass);
+  flex-shrink: 0;
 }
 
 .status-dot {
@@ -233,6 +234,7 @@ body {
   height: 9px;
   border-radius: 50%;
   position: relative;
+  flex-shrink: 0;
 }
 
 .dot-online {
@@ -265,6 +267,7 @@ body {
   max-width: 1340px;
   margin: 0 auto;
   padding: 28px 24px 60px 24px;
+  width: 100%;
 }
 
 .tab-container {
@@ -348,6 +351,7 @@ body {
 .button-group {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .btn-mode {
@@ -364,6 +368,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .btn-mode:hover {
@@ -436,6 +441,7 @@ body {
   justify-content: center;
   gap: 8px;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .btn-primary {
@@ -526,7 +532,7 @@ body {
   color: #38BDF8;
   background: rgba(6, 182, 212, 0.12);
   border: 1px solid rgba(6, 182, 212, 0.3);
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 6px;
   max-width: 220px;
   overflow: hidden;
@@ -541,17 +547,12 @@ body {
   gap: 24px;
 }
 
-@media (max-width: 960px) {
-  .grid-2col {
-    grid-template-columns: 1fr;
-  }
-}
-
 .card-header-flex {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
+  gap: 10px;
 }
 
 .hint-pill {
@@ -563,6 +564,7 @@ body {
   padding: 4px 12px;
   border-radius: 20px;
   letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 /* ================= Visual Media Viewer & Dropzones ================= */
@@ -888,6 +890,7 @@ body {
   gap: 8px;
   font-weight: 600;
   color: var(--text-main);
+  flex-shrink: 0;
 }
 
 .bar-emoji {
@@ -930,6 +933,7 @@ body {
   font-family: var(--font-mono);
   color: var(--text-secondary);
   font-weight: 600;
+  flex-shrink: 0;
 }
 
 .bar-top .bar-value {
@@ -974,6 +978,7 @@ body {
   font-weight: 700;
   color: var(--text-pure);
   margin-bottom: 22px;
+  word-break: break-all;
 }
 
 .audio-element {
@@ -1010,12 +1015,6 @@ body {
   margin-bottom: 24px;
 }
 
-@media (max-width: 768px) {
-  .fusion-inputs-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .input-source-card {
   background: var(--bg-card-sub);
   border: 1px solid var(--border-glass-bright);
@@ -1038,10 +1037,12 @@ body {
   padding: 8px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-sm);
+  flex-shrink: 0;
 }
 
 .source-details {
   flex: 1;
+  min-width: 0;
 }
 
 .source-details strong {
@@ -1055,6 +1056,9 @@ body {
   font-family: var(--font-mono);
   color: #38BDF8;
   margin: 4px 0 10px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .slider-action-row {
@@ -1068,7 +1072,7 @@ body {
 
 .slider-container {
   flex: 1;
-  min-width: 280px;
+  min-width: 260px;
 }
 
 .slider-label-row {
@@ -1345,6 +1349,7 @@ body {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .btn-filter:hover {
@@ -1359,12 +1364,14 @@ body {
 
 .table-responsive {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  min-width: 600px;
 }
 
 .data-table th {
@@ -1399,6 +1406,8 @@ body {
   font-size: 11px;
   font-weight: 700;
   font-family: var(--font-mono);
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .emotion-name {
@@ -1422,12 +1431,6 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   margin-bottom: 28px;
-}
-
-@media (max-width: 860px) {
-  .about-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .about-section {
@@ -1507,4 +1510,400 @@ body {
   font-size: 13px;
   margin-bottom: 24px;
   box-shadow: 0 4px 18px rgba(244, 63, 94, 0.15);
+}
+
+/* ==========================================================================
+   RESPONSIVE MEDIA QUERIES (Large Desktop down to Mobile Portrait)
+   ========================================================================== */
+
+/* 1. Large Tablets & Medium Laptops (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 12px 20px;
+  }
+
+  .nav-tabs {
+    gap: 4px;
+  }
+
+  .tab-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .main-content {
+    padding: 22px 18px 48px 18px;
+  }
+}
+
+/* 2. Tablets & Small Laptops (max-width: 960px) */
+@media (max-width: 960px) {
+  .navbar {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  /* Reposition Tab Bar into a full-width horizontally scrollable row */
+  .nav-tabs {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px;
+    justify-content: flex-start;
+  }
+
+  .nav-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-btn {
+    flex-shrink: 0;
+    min-height: 38px;
+  }
+
+  /* Convert 2-column grids into stacked columns */
+  .grid-2col {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .toolbar-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 16px 18px;
+  }
+
+  .button-group {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .btn-mode {
+    justify-content: center;
+    padding: 8px 8px;
+    font-size: 12px;
+  }
+
+  .input-group {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .input-group .btn {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .input-group .select-dropdown {
+    width: 100%;
+  }
+
+  .modality-breakdown-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* 3. Small Tablets & Phablets (max-width: 768px) */
+@media (max-width: 768px) {
+  .card {
+    padding: 20px 16px;
+    border-radius: var(--radius-md);
+  }
+
+  .media-viewer, .audio-display-box {
+    min-height: 320px;
+    max-height: 400px;
+    padding: 18px;
+  }
+
+  .fusion-inputs-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .slider-action-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .slider-container {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .btn-large {
+    width: 100%;
+  }
+
+  .fusion-header-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .fused-emotion-title {
+    font-size: 30px;
+  }
+
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .history-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .filter-buttons {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .btn-filter {
+    text-align: center;
+    padding: 6px 4px;
+    font-size: 10px;
+  }
+}
+
+/* 4. Mobile Phones Portrait (max-width: 576px) */
+@media (max-width: 576px) {
+  .navbar {
+    padding: 10px 14px;
+  }
+
+  .brand-logo {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+
+  .brand-title {
+    font-size: 16px;
+  }
+
+  .brand-subtitle {
+    display: none; /* Hide subtitle to keep header clean and compact on small phones */
+  }
+
+  .nav-status {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .status-text {
+    display: none; /* Show only pulsing indicator dot on narrow viewports */
+  }
+
+  .main-content {
+    padding: 12px 10px 40px 10px;
+  }
+
+  .card {
+    padding: 16px 12px;
+  }
+
+  .card-heading {
+    font-size: 13px;
+  }
+
+  /* Toolbar buttons on phones */
+  .button-group {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .btn-mode {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+
+  .input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .input-group .btn {
+    width: 100%;
+  }
+
+  .file-name {
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  /* Media Viewer Compact Height */
+  .media-viewer, .audio-display-box {
+    min-height: 270px;
+    max-height: 340px;
+    padding: 12px;
+  }
+
+  .video-element, .image-preview {
+    max-height: 280px;
+  }
+
+  .badge-live-camera {
+    font-size: 10px;
+    padding: 4px 8px;
+    top: 10px;
+    left: 10px;
+  }
+
+  .badge-stream-active {
+    top: 10px;
+    left: 105px !important;
+  }
+
+  .webcam-view-toggle {
+    top: 10px;
+    right: 10px;
+  }
+
+  .btn-toggle-view {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .webcam-emotion-overlay {
+    bottom: 10px;
+    left: 10px;
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .btn-change-image {
+    top: 10px;
+    right: 10px;
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .placeholder-box {
+    padding: 24px 12px;
+  }
+
+  .placeholder-icon {
+    font-size: 38px;
+    margin-bottom: 10px;
+  }
+
+  .placeholder-box strong {
+    font-size: 13px !important;
+  }
+
+  .placeholder-box p {
+    font-size: 11px !important;
+  }
+
+  /* Top Result Badge on Phones */
+  .top-result-badge {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 16px;
+  }
+
+  .emotion-title {
+    font-size: 22px;
+  }
+
+  .confidence-pill {
+    font-size: 13px;
+    padding: 4px 10px;
+  }
+
+  /* Emotion Progress Bars on Phones */
+  .bar-row {
+    gap: 8px;
+    padding: 5px 6px;
+  }
+
+  .bar-label {
+    width: 78px;
+    font-size: 12px;
+    gap: 5px;
+  }
+
+  .bar-emoji {
+    font-size: 14px;
+  }
+
+  .bar-track {
+    height: 9px;
+  }
+
+  .bar-value {
+    width: 44px;
+    font-size: 11px;
+  }
+
+  /* Audio Tab on Phones */
+  .audio-icon-banner {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+
+  .audio-title {
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+
+  /* Multimodal Fusion on Phones */
+  .fused-emotion-title {
+    font-size: 26px;
+  }
+
+  .badge-congruent, .badge-incongruent {
+    padding: 10px 14px;
+    gap: 10px;
+  }
+
+  .badge-congruent .badge-icon, .badge-incongruent .badge-icon {
+    font-size: 18px;
+  }
+
+  .badge-congruent strong, .badge-incongruent strong {
+    font-size: 12px;
+  }
+
+  /* History Table on Phones */
+  .data-table th, .data-table td {
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+}
+
+/* 5. Extra Small Phones (max-width: 380px) */
+@media (max-width: 380px) {
+  .brand-title {
+    font-size: 14px;
+  }
+
+  .tab-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .bar-label {
+    width: 68px;
+    font-size: 11px;
+  }
 }
