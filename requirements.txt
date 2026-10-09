@@ -1,0 +1,23 @@
+# Multimodal Emotion Recognition System
+# Requirements & Dependencies
+
+# Scientific Computing & Data Processing
+numpy>=1.24.0
+scipy>=1.10.0
+scikit-learn>=1.3.0
+joblib>=1.3.0
+
+# Computer Vision & Image Processing
+opencv-python>=4.8.0,<5.0.0
+pillow>=9.5.0
+
+# Audio Processing & Feature Extraction
+librosa>=0.10.0
+soundfile>=0.12.0
+
+# Deep Learning Backend (for Facial Emotion CNN)
+tensorflow>=2.15.0
+keras>=3.0.0
+
+# Optional Audio Recording from Microphone
+sounddevice>=0.4.6
