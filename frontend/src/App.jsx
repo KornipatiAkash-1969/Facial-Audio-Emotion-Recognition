@@ -12,6 +12,7 @@ export default function App() {
   const [status, setStatus] = useState(null);
   const [samples, setSamples] = useState({ faces: [], audios: [] });
   const [backendOnline, setBackendOnline] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('app-theme') || 'dark');
 
   // Shared inputs for Multimodal tab
   const [multimodalFace, setMultimodalFace] = useState(null);
@@ -19,6 +20,12 @@ export default function App() {
 
   // Session history
   const [history, setHistory] = useState([]);
+
+  // Sync theme attribute on document root
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('app-theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     async function init() {
@@ -100,12 +107,38 @@ export default function App() {
           </button>
         </nav>
 
-        {/* Backend Status Indicator */}
-        <div className="nav-status">
-          <span className={`status-dot ${backendOnline ? 'dot-online' : 'dot-offline'}`} />
-          <span className="status-text">
-            {backendOnline ? 'REST API Online' : 'Connecting to API...'}
-          </span>
+        {/* Navigation Controls: Theme Switcher & Status */}
+        <div className="nav-controls">
+          <div className="theme-toggle-group">
+            <button
+              className={`btn-theme ${theme === 'dark' ? 'theme-active' : ''}`}
+              onClick={() => setTheme('dark')}
+              title="Obsidian Dark Theme"
+            >
+              🌙 Dark
+            </button>
+            <button
+              className={`btn-theme ${theme === 'light' ? 'theme-active' : ''}`}
+              onClick={() => setTheme('light')}
+              title="Modern Clean Light Theme"
+            >
+              ☀️ Light
+            </button>
+            <button
+              className={`btn-theme ${theme === 'cyber' ? 'theme-active' : ''}`}
+              onClick={() => setTheme('cyber')}
+              title="Cyberpunk Neon Theme"
+            >
+              ⚡ Cyber
+            </button>
+          </div>
+
+          <div className="nav-status">
+            <span className={`status-dot ${backendOnline ? 'dot-online' : 'dot-offline'}`} />
+            <span className="status-text">
+              {backendOnline ? 'REST API Online' : 'Connecting...'}
+            </span>
+          </div>
         </div>
       </header>
 
