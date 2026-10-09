@@ -17,7 +17,7 @@ export function getApiBase() {
   ) {
     return 'http://localhost:8000';
   }
-  return '';
+  return 'https://facial-audio-emotion-recognition.onrender.com';
 }
 
 export function setCustomApiUrl(url) {
