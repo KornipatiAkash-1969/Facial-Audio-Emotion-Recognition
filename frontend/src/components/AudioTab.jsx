@@ -278,10 +278,16 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
               }
             }}
           >
+            {/* High-Tech HUD Reticles */}
+            <span className="hud-corner hud-tl" />
+            <span className="hud-corner hud-tr" />
+            <span className="hud-corner hud-bl" />
+            <span className="hud-corner hud-br" />
+
             {mode === 'record' && !isRecording && !audioUrl && (
               <div className="placeholder-box">
                 <span className="placeholder-icon">🎙️</span>
-                <strong style={{ fontSize: '15px', color: '#E2E8F0' }}>
+                <strong style={{ fontSize: '15px' }}>
                   Microphone is Currently Idle
                 </strong>
                 <p style={{ marginTop: '8px' }}>
@@ -297,7 +303,31 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
               </div>
             )}
 
-            {audioUrl ? (
+            {mode === 'record' && isRecording && (
+              <div className="recording-live-zone">
+                <div className="badge-live-camera">
+                  <span className="live-dot" /> RECORDING SPEECH
+                </div>
+                <div className="recording-timer-hero">{recordDuration}s</div>
+                <div className="soundwave-container soundwave-recording">
+                  {[...Array(28)].map((_, i) => (
+                    <span
+                      key={i}
+                      className="soundwave-bar soundwave-active"
+                      style={{
+                        animationDelay: `${(i * 0.05).toFixed(2)}s`,
+                      }}
+                    />
+                  ))}
+                </div>
+                <p className="recording-prompt">Capturing acoustic speech frequencies in real time...</p>
+                <button className="btn btn-danger" onClick={stopRecording} style={{ marginTop: '16px' }}>
+                  ⏹ Stop & Analyze Audio
+                </button>
+              </div>
+            )}
+
+            {audioUrl && (
               <div
                 className="audio-player-wrapper"
                 onClick={(e) => e.stopPropagation()}
@@ -314,6 +344,20 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
                 <h4 className="audio-title">
                   {selectedFile?.name || selectedSample || 'Microphone Recording'}
                 </h4>
+
+                {/* Animated Audio Equalizer Visualizer */}
+                <div className="soundwave-container">
+                  {[...Array(32)].map((_, i) => (
+                    <span
+                      key={i}
+                      className="soundwave-bar"
+                      style={{
+                        animationDelay: `${(i * 0.04).toFixed(2)}s`,
+                      }}
+                    />
+                  ))}
+                </div>
+
                 <audio controls src={audioUrl} className="audio-element" />
                 {loading && (
                   <div className="loading-overlay" style={{ marginTop: '16px' }}>
@@ -322,10 +366,12 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
                   </div>
                 )}
               </div>
-            ) : mode !== 'record' ? (
+            )}
+
+            {!audioUrl && mode !== 'record' && (
               <div className="placeholder-box">
                 <span className="placeholder-icon">🔊</span>
-                <strong style={{ fontSize: '15px', color: '#E2E8F0' }}>
+                <strong style={{ fontSize: '15px' }}>
                   Click to Browse or Drag & Drop Audio File (.wav)
                 </strong>
                 <p style={{ marginTop: '6px' }}>Supports WAV, MP3, FLAC, and OGG</p>
@@ -339,7 +385,7 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
                   </button>
                 )}
               </div>
-            ) : null}
+            )}
           </div>
         </div>
 
@@ -354,16 +400,28 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
             </div>
           ) : result ? (
             <div className="metrics-content">
-              <div className="top-result-badge">
-                <span className="emotion-title">{result.emotion}</span>
+              <div className={`top-result-badge emotion-glow-${result.emotion.toLowerCase()}`}>
+                <div className="result-headline">
+                  <span className="emotion-title">{result.emotion}</span>
+                  <span className="emotion-emoji-hero">
+                    {result.emotion === 'Happy' ? '😄' :
+                     result.emotion === 'Angry' ? '😠' :
+                     result.emotion === 'Sad' ? '😢' :
+                     result.emotion === 'Surprise' ? '😲' :
+                     result.emotion === 'Fear' ? '😨' :
+                     result.emotion === 'Disgust' ? '🤢' : '😐'}
+                  </span>
+                </div>
                 <span className="confidence-pill">
                   {(result.confidence * 100).toFixed(1)}% Confidence
                 </span>
               </div>
 
-              <div className="info-chip">
-                <span>Duration: {result.duration_seconds} seconds</span>
-                <span style={{ marginLeft: '12px' }}>Features: 40 MFCCs</span>
+              <div className="telemetry-bar">
+                <span className="telemetry-item"><strong>DURATION:</strong> {result.duration_seconds}s</span>
+                <span className="telemetry-item"><strong>SAMPLING:</strong> 22,050 Hz</span>
+                <span className="telemetry-item"><strong>ACOUSTIC TENSOR:</strong> 40 MFCCs</span>
+                <span className="telemetry-item"><strong>MODEL:</strong> MLP Neural Net</span>
               </div>
 
               <EmotionBarChart

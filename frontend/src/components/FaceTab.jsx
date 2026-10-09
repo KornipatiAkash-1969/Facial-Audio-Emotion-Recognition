@@ -416,6 +416,13 @@ export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
               }
             }}
           >
+            {/* HUD Corner Reticles & Scanning Laser */}
+            <span className="hud-corner hud-tl" />
+            <span className="hud-corner hud-tr" />
+            <span className="hud-corner hud-bl" />
+            <span className="hud-corner hud-br" />
+            {(loading || (isWebcamActive && autoPredict)) && <div className="hud-scanline" />}
+
             {/* WEBCAM MODE: ACTIVE */}
             {mode === 'webcam' && isWebcamActive && (
               <div className="webcam-wrapper">
@@ -439,7 +446,7 @@ export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
 
                 {/* Status Badges */}
                 <div className="badge-live-camera">
-                  <span>●</span> LIVE CAMERA
+                  <span className="live-dot" /> LIVE CAMERA
                 </div>
                 {autoPredict && (
                   <div
@@ -470,7 +477,7 @@ export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
 
                 {/* Overlay with current emotion */}
                 {result && (
-                  <div className="webcam-emotion-overlay">
+                  <div className={`webcam-emotion-overlay emotion-glow-${result.primary_emotion.toLowerCase()}`}>
                     <span style={{ fontSize: '18px' }}>
                       {result.primary_emotion === 'Happy'
                         ? '😊'
@@ -505,7 +512,7 @@ export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
             {mode === 'webcam' && !isWebcamActive && (
               <div className="placeholder-box">
                 <span className="placeholder-icon">📷</span>
-                <strong style={{ fontSize: '15px', color: '#E2E8F0' }}>
+                <strong style={{ fontSize: '15px' }}>
                   Live Webcam is Currently Off
                 </strong>
                 <p style={{ marginTop: '8px', maxWidth: '340px' }}>
@@ -546,7 +553,7 @@ export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
             {mode !== 'webcam' && !previewUrl && (
               <div className="placeholder-box">
                 <span className="placeholder-icon">📁</span>
-                <strong style={{ fontSize: '15px', color: '#E2E8F0' }}>
+                <strong style={{ fontSize: '15px' }}>
                   Click to Browse or Drag & Drop Image Here
                 </strong>
                 <p style={{ marginTop: '6px' }}>Supports JPG, PNG, WEBP, and BMP</p>
@@ -575,15 +582,27 @@ export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
             </div>
           ) : result ? (
             <div className="metrics-content">
-              <div className="top-result-badge">
-                <span className="emotion-title">{result.primary_emotion}</span>
+              <div className={`top-result-badge emotion-glow-${result.primary_emotion.toLowerCase()}`}>
+                <div className="result-headline">
+                  <span className="emotion-title">{result.primary_emotion}</span>
+                  <span className="emotion-emoji-hero">
+                    {result.primary_emotion === 'Happy' ? '😄' :
+                     result.primary_emotion === 'Angry' ? '😠' :
+                     result.primary_emotion === 'Sad' ? '😢' :
+                     result.primary_emotion === 'Surprise' ? '😲' :
+                     result.primary_emotion === 'Fear' ? '😨' :
+                     result.primary_emotion === 'Disgust' ? '🤢' : '😐'}
+                  </span>
+                </div>
                 <span className="confidence-pill">
                   {(result.primary_confidence * 100).toFixed(1)}% Confidence
                 </span>
               </div>
 
-              <div className="info-chip">
-                <span>Faces Detected: {result.num_faces}</span>
+              <div className="telemetry-bar">
+                <span className="telemetry-item"><strong>FACES DETECTED:</strong> {result.num_faces}</span>
+                <span className="telemetry-item"><strong>TENSOR:</strong> 48×48 Gray</span>
+                <span className="telemetry-item"><strong>INFERENCE:</strong> 4-Block CNN</span>
               </div>
 
               <EmotionBarChart

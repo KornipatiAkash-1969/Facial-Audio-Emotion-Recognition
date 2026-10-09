@@ -2,6 +2,16 @@ import React, { useState, useRef } from 'react';
 import { predictMultimodal } from '../services/api';
 import EmotionBarChart from './EmotionBarChart';
 
+const EMOTION_EMOJIS = {
+  Angry: '😠',
+  Disgust: '🤢',
+  Fear: '😨',
+  Happy: '😄',
+  Neutral: '😐',
+  Sad: '😢',
+  Surprise: '😲',
+};
+
 export default function FusionTab({
   samples,
   multimodalFace,
@@ -216,11 +226,16 @@ export default function FusionTab({
 
       {/* Main Results Dashboard */}
       {result && (
-        <div className="card fusion-results-card">
+        <div className={`card fusion-results-card emotion-glow-${result.fused_emotion.toLowerCase()}`}>
           <div className="fusion-header-banner">
             <div>
               <span className="subtitle">Integrated Emotion Decision</span>
-              <h2 className="fused-emotion-title">{result.fused_emotion}</h2>
+              <div className="result-headline" style={{ marginTop: '4px' }}>
+                <h2 className="fused-emotion-title">{result.fused_emotion}</h2>
+                <span className="emotion-emoji-hero">
+                  {EMOTION_EMOJIS[result.fused_emotion] || '✨'}
+                </span>
+              </div>
               <span className="fused-confidence-tag">
                 {(result.fused_confidence * 100).toFixed(1)}% Fused Confidence
               </span>
@@ -250,22 +265,50 @@ export default function FusionTab({
           {/* Modality Breakdown Cards */}
           <div className="modality-breakdown-grid">
             <div className="breakdown-card visual-card">
-              <span className="breakdown-title">Visual Facial Cue</span>
+              <span className="hud-corner hud-tl" />
+              <span className="hud-corner hud-tr" />
+              <div className="breakdown-header-flex">
+                <span className="breakdown-title">Visual Facial Cue</span>
+                <span className="breakdown-emoji">{EMOTION_EMOJIS[result.face.emotion] || '👤'}</span>
+              </div>
               <h3>{result.face.emotion}</h3>
-              <p>Confidence: {(result.face.confidence * 100).toFixed(1)}%</p>
-              <span className="weight-tag">Weight Applied: {(result.face.weight * 100).toFixed(0)}%</span>
+              <div className="breakdown-metric-row">
+                <span>Confidence</span>
+                <strong>{(result.face.confidence * 100).toFixed(1)}%</strong>
+              </div>
+              <div className="breakdown-progress-track">
+                <div
+                  className="breakdown-progress-fill visual-fill"
+                  style={{ width: `${Math.max(result.face.confidence * 100, 4)}%` }}
+                />
+              </div>
+              <span className="weight-tag">Decision Weight: {(result.face.weight * 100).toFixed(0)}%</span>
             </div>
 
             <div className="breakdown-card acoustic-card">
-              <span className="breakdown-title">Acoustic Speech Cue</span>
+              <span className="hud-corner hud-tl" />
+              <span className="hud-corner hud-tr" />
+              <div className="breakdown-header-flex">
+                <span className="breakdown-title">Acoustic Speech Cue</span>
+                <span className="breakdown-emoji">{EMOTION_EMOJIS[result.audio.emotion] || '🎙️'}</span>
+              </div>
               <h3>{result.audio.emotion}</h3>
-              <p>Confidence: {(result.audio.confidence * 100).toFixed(1)}%</p>
-              <span className="weight-tag">Weight Applied: {(result.audio.weight * 100).toFixed(0)}%</span>
+              <div className="breakdown-metric-row">
+                <span>Confidence</span>
+                <strong>{(result.audio.confidence * 100).toFixed(1)}%</strong>
+              </div>
+              <div className="breakdown-progress-track">
+                <div
+                  className="breakdown-progress-fill acoustic-fill"
+                  style={{ width: `${Math.max(result.audio.confidence * 100, 4)}%` }}
+                />
+              </div>
+              <span className="weight-tag">Decision Weight: {(result.audio.weight * 100).toFixed(0)}%</span>
             </div>
           </div>
 
           {/* Combined Distribution & Psychological Insight */}
-          <div className="grid-2col" style={{ marginTop: '20px' }}>
+          <div className="grid-2col" style={{ marginTop: '24px' }}>
             <div className="card-sub">
               <EmotionBarChart
                 probabilities={result.combined_probabilities}
@@ -274,10 +317,45 @@ export default function FusionTab({
             </div>
 
             <div className="card-sub insight-box">
-              <h4 className="chart-title">Affective Computing & Psychological Interpretation</h4>
+              <h4 className="chart-title">Cross-Modal Affective Interpretation</h4>
               <p className="insight-text">{result.insight}</p>
-              <div className="similarity-meta">
-                <span>Cross-Modal Cosine Alignment: <strong>{result.congruency_score}</strong></span>
+
+              {/* High-Tech Circular Congruency Gauge */}
+              <div className="alignment-gauge-container">
+                <div className="gauge-circle-wrap">
+                  <svg className="gauge-svg" viewBox="0 0 100 100">
+                    <circle className="gauge-bg" cx="50" cy="50" r="40" />
+                    <circle
+                      className="gauge-progress"
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      strokeDasharray="251.2"
+                      strokeDashoffset={
+                        251.2 * (1 - Math.min(Math.max(result.congruency_score, 0), 1))
+                      }
+                    />
+                  </svg>
+                  <div className="gauge-center-text">
+                    <span className="gauge-value">
+                      {(result.congruency_score * 100).toFixed(0)}%
+                    </span>
+                    <span className="gauge-unit">ALIGN</span>
+                  </div>
+                </div>
+
+                <div className="gauge-details">
+                  <span className="gauge-title">Cosine Modality Alignment</span>
+                  <p className="gauge-desc">
+                    {result.is_congruent
+                      ? 'High cosine vector similarity between facial expression tensor and acoustic spectral features.'
+                      : 'Affective dissonance detected: visual and acoustic channels signal opposing emotional states.'}
+                  </p>
+                  <div className="telemetry-bar" style={{ marginTop: '10px' }}>
+                    <span className="telemetry-item"><strong>SCORE:</strong> {result.congruency_score}</span>
+                    <span className="telemetry-item"><strong>STATE:</strong> {result.is_congruent ? 'SYNERGISTIC' : 'DISSONANT'}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

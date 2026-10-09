@@ -726,6 +726,84 @@ body {
   transform: scale(1.005);
 }
 
+/* ==========================================================================
+   HUD CORNER TARGETING RETICLES & SCANLINE
+   ========================================================================== */
+.hud-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  z-index: 10;
+  border: 2px solid rgba(6, 182, 212, 0.7);
+  transition: all 0.3s ease;
+}
+
+[data-theme="cyber"] .hud-corner {
+  border-color: #06B6D4;
+  box-shadow: 0 0 8px #06B6D4;
+}
+
+[data-theme="light"] .hud-corner {
+  border-color: #6366F1;
+}
+
+.hud-tl {
+  top: 10px;
+  left: 10px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.hud-tr {
+  top: 10px;
+  right: 10px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.hud-bl {
+  bottom: 10px;
+  left: 10px;
+  border-right: none;
+  border-top: none;
+}
+
+.hud-br {
+  bottom: 10px;
+  right: 10px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Animated HUD Laser Scanline */
+.hud-scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(6, 182, 212, 0.8) 50%, transparent 100%);
+  box-shadow: 0 0 14px 2px rgba(6, 182, 212, 0.7);
+  pointer-events: none;
+  z-index: 11;
+  animation: scanline-sweep 2.4s ease-in-out infinite;
+}
+
+@keyframes scanline-sweep {
+  0% {
+    top: 5%;
+    opacity: 0.2;
+  }
+  50% {
+    top: 92%;
+    opacity: 0.9;
+  }
+  100% {
+    top: 5%;
+    opacity: 0.2;
+  }
+}
+
 /* Webcam Element & Wrapper */
 .webcam-wrapper {
   width: 100%;
@@ -961,6 +1039,108 @@ body {
   box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
 }
 
+.result-headline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.emotion-emoji-hero {
+  font-size: 32px;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+  animation: hero-bounce 2s ease-in-out infinite;
+}
+
+@keyframes hero-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* High-Tech Telemetry Bar */
+.telemetry-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.telemetry-item {
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.telemetry-item strong {
+  color: var(--cyan-neon);
+  margin-right: 4px;
+}
+
+/* Dynamic Emotion Glow Modifiers */
+.emotion-glow-happy {
+  border-color: rgba(245, 158, 11, 0.5) !important;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.2), inset 0 0 15px rgba(245, 158, 11, 0.05) !important;
+}
+.emotion-glow-happy::before {
+  background: linear-gradient(180deg, #F59E0B, #FBBF24) !important;
+}
+
+.emotion-glow-angry {
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.2), inset 0 0 15px rgba(239, 68, 68, 0.05) !important;
+}
+.emotion-glow-angry::before {
+  background: linear-gradient(180deg, #DC2626, #EF4444) !important;
+}
+
+.emotion-glow-sad {
+  border-color: rgba(59, 130, 246, 0.5) !important;
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.2), inset 0 0 15px rgba(59, 130, 246, 0.05) !important;
+}
+.emotion-glow-sad::before {
+  background: linear-gradient(180deg, #2563EB, #3B82F6) !important;
+}
+
+.emotion-glow-surprise {
+  border-color: rgba(217, 119, 6, 0.5) !important;
+  box-shadow: 0 0 25px rgba(217, 119, 6, 0.2), inset 0 0 15px rgba(217, 119, 6, 0.05) !important;
+}
+.emotion-glow-surprise::before {
+  background: linear-gradient(180deg, #D97706, #F59E0B) !important;
+}
+
+.emotion-glow-fear {
+  border-color: rgba(139, 92, 246, 0.5) !important;
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.2), inset 0 0 15px rgba(139, 92, 246, 0.05) !important;
+}
+.emotion-glow-fear::before {
+  background: linear-gradient(180deg, #7C3AED, #8B5CF6) !important;
+}
+
+.emotion-glow-disgust {
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.2), inset 0 0 15px rgba(16, 185, 129, 0.05) !important;
+}
+.emotion-glow-disgust::before {
+  background: linear-gradient(180deg, #059669, #10B981) !important;
+}
+
+.emotion-glow-neutral {
+  border-color: rgba(100, 116, 139, 0.5) !important;
+  box-shadow: 0 0 25px rgba(100, 116, 139, 0.2), inset 0 0 15px rgba(100, 116, 139, 0.05) !important;
+}
+.emotion-glow-neutral::before {
+  background: linear-gradient(180deg, #475569, #94A3B8) !important;
+}
+
 .info-chip {
   font-size: 12px;
   font-weight: 600;
@@ -976,13 +1156,31 @@ body {
   margin-top: 14px;
 }
 
+.chart-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
 .chart-title {
   font-size: 12px;
   font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  margin-bottom: 12px;
+  margin-bottom: 0;
+}
+
+.spectrum-badge {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--cyan-neon);
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  padding: 2px 8px;
+  border-radius: 6px;
 }
 
 .chart-bars {
@@ -1015,13 +1213,25 @@ body {
 }
 
 .bar-label {
-  width: 95px;
+  width: 105px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-weight: 600;
   color: var(--text-main);
   flex-shrink: 0;
+}
+
+.top-pill {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #FFFFFF;
+  background: var(--primary-gradient);
+  padding: 1px 5px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+  margin-left: auto;
 }
 
 .bar-emoji {
@@ -1036,6 +1246,7 @@ body {
   border-radius: 6px;
   overflow: hidden;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  position: relative;
 }
 
 .bar-fill {
@@ -1044,6 +1255,26 @@ body {
   transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 0 12px currentColor;
   position: relative;
+  overflow: hidden;
+}
+
+.bar-fill-top {
+  box-shadow: 0 0 16px currentColor;
+}
+
+.shimmer-glint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 25px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 50%, transparent 100%);
+  animation: glint-slide 2.4s infinite;
+}
+
+@keyframes glint-slide {
+  0% { transform: translateX(-30px); }
+  60%, 100% { transform: translateX(260px); }
 }
 
 .bar-fill::after {
@@ -1055,6 +1286,12 @@ body {
   height: 50%;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), transparent);
   border-radius: 6px 6px 0 0;
+}
+
+.bar-value-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .bar-value {
@@ -1134,6 +1371,73 @@ body {
   align-items: center;
   gap: 6px;
   animation: pulse-stream 1.5s infinite;
+}
+
+/* Animated Audio Equalizer Visualizer */
+.soundwave-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 52px;
+  margin: 18px 0;
+  padding: 0 12px;
+}
+
+.soundwave-bar {
+  width: 4px;
+  height: 12px;
+  background: linear-gradient(180deg, var(--cyan-neon) 0%, var(--indigo-neon) 100%);
+  border-radius: 4px;
+  transition: height 0.15s ease;
+  animation: soundwave-dance 1.2s ease-in-out infinite;
+}
+
+[data-theme="light"] .soundwave-bar {
+  background: linear-gradient(180deg, #4F46E5 0%, #06B6D4 100%);
+}
+
+.soundwave-active {
+  background: linear-gradient(180deg, #F43F5E 0%, #EF4444 100%) !important;
+  animation-duration: 0.75s !important;
+}
+
+@keyframes soundwave-dance {
+  0%, 100% {
+    height: 8px;
+    opacity: 0.45;
+  }
+  50% {
+    height: 44px;
+    opacity: 1;
+    box-shadow: 0 0 10px currentColor;
+  }
+}
+
+.recording-live-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  padding: 24px;
+}
+
+.recording-timer-hero {
+  font-size: 52px;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  color: #EF4444;
+  text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+  margin: 14px 0 8px 0;
+  line-height: 1;
+}
+
+.recording-prompt {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
 }
 
 /* ==========================================================================
@@ -1365,10 +1669,19 @@ body {
 }
 
 .breakdown-card {
-  padding: 20px;
+  padding: 22px;
   border-radius: var(--radius-md);
   background: var(--bg-card-sub);
   border: 1px solid var(--border-card-bright);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: all 0.25s ease;
+}
+
+.breakdown-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
 }
 
 .visual-card {
@@ -1379,6 +1692,17 @@ body {
   border-left: 3px solid var(--violet-neon);
 }
 
+.breakdown-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.breakdown-emoji {
+  font-size: 24px;
+}
+
 .breakdown-title {
   font-size: 12px;
   text-transform: uppercase;
@@ -1386,14 +1710,52 @@ body {
   font-weight: 700;
   color: var(--text-secondary);
   display: block;
-  margin-bottom: 6px;
 }
 
 .breakdown-card h3 {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 800;
   color: var(--text-pure);
   margin-bottom: 4px;
+}
+
+.breakdown-metric-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  margin-bottom: 6px;
+}
+
+.breakdown-metric-row strong {
+  font-family: var(--font-mono);
+  color: var(--text-pure);
+}
+
+.breakdown-progress-track {
+  width: 100%;
+  height: 6px;
+  background: var(--track-bg);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.breakdown-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.visual-fill {
+  background: linear-gradient(90deg, #06B6D4, #3B82F6);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+.acoustic-fill {
+  background: linear-gradient(90deg, #8B5CF6, #EC4899);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
 }
 
 .breakdown-card p {
@@ -1411,6 +1773,7 @@ body {
   padding: 4px 10px;
   border-radius: 12px;
   color: var(--badge-text);
+  display: inline-block;
 }
 
 /* Psychological Insight Box */
@@ -1425,23 +1788,98 @@ body {
   line-height: 1.7;
   color: var(--text-main);
   font-style: italic;
-  margin: 10px 0 16px 0;
+  margin: 10px 0 14px 0;
   border-left: 2px solid var(--indigo-neon);
   padding-left: 14px;
 }
 
-.similarity-meta {
-  font-size: 13px;
-  font-family: var(--font-mono);
-  color: var(--text-secondary);
+/* High-Tech Circular Congruency Alignment Gauge */
+.alignment-gauge-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px;
   background: var(--bg-card);
-  padding: 8px 14px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-card);
+  border: 1px solid var(--border-card-bright);
+  border-radius: var(--radius-md);
+  margin-top: 14px;
 }
 
-.similarity-meta strong {
-  color: var(--indigo-neon);
+.gauge-circle-wrap {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  flex-shrink: 0;
+}
+
+.gauge-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.gauge-bg {
+  fill: none;
+  stroke: var(--track-bg);
+  stroke-width: 8;
+}
+
+.gauge-progress {
+  fill: none;
+  stroke: var(--cyan-neon);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s ease;
+}
+
+[data-theme="cyber"] .gauge-progress {
+  stroke: #10B981;
+  filter: drop-shadow(0 0 6px #10B981);
+}
+
+.gauge-center-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauge-value {
+  font-size: 18px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--text-pure);
+  line-height: 1;
+}
+
+.gauge-unit {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--cyan-neon);
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.gauge-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.gauge-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-pure);
+  display: block;
+}
+
+.gauge-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-top: 4px;
 }
 
 /* ==========================================================================
@@ -1794,6 +2232,22 @@ body {
     font-size: 30px;
   }
 
+  .modality-breakdown-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .alignment-gauge-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+    padding: 14px;
+  }
+
+  .gauge-details .telemetry-bar {
+    justify-content: center;
+  }
+
   .history-header {
     flex-direction: column;
     align-items: flex-start;
@@ -1964,6 +2418,34 @@ body {
   .confidence-pill {
     font-size: 13px;
     padding: 4px 10px;
+  }
+
+  .emotion-emoji-hero {
+    font-size: 26px;
+  }
+
+  .telemetry-bar {
+    font-size: 10px;
+    padding: 6px 10px;
+    gap: 6px;
+  }
+
+  .telemetry-item {
+    padding: 2px 6px;
+  }
+
+  .soundwave-container {
+    height: 38px;
+    gap: 3px;
+    margin: 12px 0;
+  }
+
+  .soundwave-bar {
+    width: 3px;
+  }
+
+  .recording-timer-hero {
+    font-size: 40px;
   }
 
   .bar-row {
