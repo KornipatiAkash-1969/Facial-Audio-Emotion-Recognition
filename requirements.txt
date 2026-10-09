@@ -21,3 +21,8 @@ keras>=3.0.0
 
 # Optional Audio Recording from Microphone
 sounddevice>=0.4.6
+
+# Web Application & REST API Backend
+fastapi>=0.110.0
+uvicorn>=0.28.0
+python-multipart>=0.0.9

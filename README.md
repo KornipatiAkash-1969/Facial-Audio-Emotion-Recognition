@@ -200,11 +200,45 @@ pip install -r requirements.txt
 
 ---
 
+---
+
 ## 🚀 How to Run
 
-### A. Desktop Graphical User Interface (GUI)
+### A. Modern Web Application (React.js + FastAPI REST API)
 
-Launch the full interactive desktop app using either `main.py` or `app.py`:
+You can run the web application in two ways:
+
+#### 1. Single-Command Mode (Production Ready)
+The compiled React application is served directly by the FastAPI backend at `http://localhost:8000`:
+
+```bash
+python server.py
+```
+
+Open your browser and navigate to:
+👉 **[http://localhost:8000](http://localhost:8000)**
+
+*(Interactive Swagger REST API documentation is also available at **[http://localhost:8000/docs](http://localhost:8000/docs)**)*
+
+#### 2. Development Mode (Hot Reload / HMR)
+To edit the React frontend with instant live-reloading:
+
+- **Terminal 1 (Backend API)**:
+  ```bash
+  python server.py
+  ```
+- **Terminal 2 (React Vite Dev Server)**:
+  ```bash
+  cd frontend
+  npm run dev
+  ```
+Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+
+---
+
+### B. Desktop Graphical User Interface (GUI)
+
+Launch the desktop Tkinter application:
 
 ```bash
 python main.py
@@ -260,15 +294,19 @@ python cli.py --webcam
 
 ---
 
-### C. Automated Test Suite
+### D. Automated Test Suites
 
-Run the unit and integration test suite to verify configuration, cascades, model weights, feature extractors, and fusion logic:
+Verify ML engines, feature extractors, and REST API endpoints:
 
 ```bash
+# 1. Test ML Engines, Preprocessing & Decision Fusion
 python test_multimodal.py
+
+# 2. Test FastAPI REST API Endpoints & Static Serving
+python test_api.py
 ```
 
-*Expected Result: All 4 test suites pass with status `OK`.*
+*Expected Result: All tests pass with status `OK`.*
 
 ---
 
