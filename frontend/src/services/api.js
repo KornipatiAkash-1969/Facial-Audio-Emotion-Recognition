@@ -6,6 +6,14 @@ const API_BASE = import.meta.env.VITE_API_URL || "";
 
 const DEFAULT_SAMPLES = {
   faces: [
+    { name: "happy_test.jpg", url: "/media/samples/faces/happy_test.jpg" },
+    { name: "sad_test.jpg", url: "/media/samples/faces/sad_test.jpg" },
+    { name: "angry_test.jpg", url: "/media/samples/faces/angry_test.jpg" },
+    { name: "surprise_test.jpg", url: "/media/samples/faces/surprise_test.jpg" },
+    { name: "neutral_test.jpg", url: "/media/samples/faces/neutral_test.jpg" },
+    { name: "fear_test.jpg", url: "/media/samples/faces/fear_test.jpg" },
+    { name: "disgust_test.jpg", url: "/media/samples/faces/disgust_test.jpg" },
+    { name: "multiface_test.jpg", url: "/media/samples/faces/multiface_test.jpg" },
     { name: "happy_PrivateTest_10077120.jpg", url: "/media/samples/faces/happy_PrivateTest_10077120.jpg" },
     { name: "angry_PrivateTest_10131363.jpg", url: "/media/samples/faces/angry_PrivateTest_10131363.jpg" },
     { name: "sad_PrivateTest_10247676.jpg", url: "/media/samples/faces/sad_PrivateTest_10247676.jpg" },

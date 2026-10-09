@@ -4,6 +4,21 @@ import { WavRecorder } from '../utils/wavRecorder';
 import EmotionBarChart from './EmotionBarChart';
 import Loader from './Loader';
 
+export function formatAudioSampleName(name) {
+  if (!name) return '';
+  const lower = name.toLowerCase();
+  if (lower.includes('tess_happy')) return '😄 Happy Voice — TESS Speech Clip';
+  if (lower.includes('tess_angry')) return '😠 Angry Voice — TESS Speech Clip';
+  if (lower.includes('tess_sad')) return '😢 Sad Voice — TESS Speech Clip';
+  if (lower.includes('tess_surprise')) return '😲 Surprise Voice — TESS Speech Clip';
+  if (lower.includes('tess_fear')) return '😨 Fear Voice — TESS Speech Clip';
+  if (lower.includes('tess_disgust')) return '🤢 Disgust Voice — TESS Speech Clip';
+  if (lower.includes('tess_neutral')) return '😐 Neutral Voice — TESS Speech Clip';
+  if (lower.includes('sample 1')) return '🎙️ Acoustic Speech Sample 1';
+  if (lower.includes('sample 2')) return '🎙️ Acoustic Speech Sample 2';
+  return `🎵 ${name}`;
+}
+
 export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) {
   const [mode, setMode] = useState('upload'); // 'upload' | 'record' | 'sample'
   const [selectedFile, setSelectedFile] = useState(null);
@@ -227,10 +242,10 @@ export default function AudioTab({ samples, onAddHistory, setMultimodalAudio }) 
               value={selectedSample}
               onChange={(e) => handleSelectSample(e.target.value)}
             >
-              <option value="">-- Choose Sample Audio --</option>
+              <option value="">-- Choose Sample Audio Clip --</option>
               {samples?.audios?.map((s) => (
                 <option key={s.name} value={s.name}>
-                  {s.name}
+                  {formatAudioSampleName(s.name)}
                 </option>
               ))}
             </select>

@@ -3,6 +3,30 @@ import { predictFace, predictFaceBase64 } from '../services/api';
 import EmotionBarChart from './EmotionBarChart';
 import Loader from './Loader';
 
+export function formatFaceSampleName(name) {
+  if (!name) return '';
+  const lower = name.toLowerCase();
+  if (lower.includes('happy_test') || lower.includes('test_happy')) return '😄 Happy Face — Studio Portrait (HD Test)';
+  if (lower.includes('angry_test') || lower.includes('test_angry')) return '😠 Angry Face — Studio Portrait (HD Test)';
+  if (lower.includes('sad_test') || lower.includes('test_sad')) return '😢 Sad Face — Studio Portrait (HD Test)';
+  if (lower.includes('surprise_test') || lower.includes('test_surprise')) return '😲 Surprise Face — Studio Portrait (HD Test)';
+  if (lower.includes('neutral_test') || lower.includes('test_neutral')) return '😐 Neutral Face — Studio Portrait (HD Test)';
+  if (lower.includes('fear_test') || lower.includes('test_fear')) return '😨 Fear Face — Studio Portrait (HD Test)';
+  if (lower.includes('disgust_test') || lower.includes('test_disgust')) return '🤢 Disgust Face — Studio Portrait (HD Test)';
+  if (lower.includes('multiface_test')) return '👥 Multi-Face Crowd Test (7 Faces)';
+  if (lower.startsWith('happy')) return '😄 Happy Face — FER Test Crop';
+  if (lower.startsWith('angry')) return '😠 Angry Face — FER Test Crop';
+  if (lower.startsWith('sad')) return '😢 Sad Face — FER Test Crop';
+  if (lower.startsWith('surprise')) return '😲 Surprise Face — FER Test Crop';
+  if (lower.startsWith('fear')) return '😨 Fear Face — FER Test Crop';
+  if (lower.startsWith('disgust')) return '🤢 Disgust Face — FER Test Crop';
+  if (lower.startsWith('neutral')) return '😐 Neutral Face — FER Test Crop';
+  if (lower.includes('test 2')) return '👥 Multi-Person Group Test 1';
+  if (lower.includes('test 3')) return '👥 Multi-Person Group Test 2';
+  if (lower.includes('small faces')) return '🔍 Small Faces Crowd Test';
+  return `🖼️ ${name}`;
+}
+
 export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
   const [mode, setMode] = useState('upload'); // 'upload' | 'webcam' | 'sample'
   const [selectedFile, setSelectedFile] = useState(null);
@@ -343,10 +367,10 @@ export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
               value={selectedSample}
               onChange={(e) => handleSelectSample(e.target.value)}
             >
-              <option value="">-- Choose Sample Face --</option>
+              <option value="">-- Choose Sample Test Face --</option>
               {samples?.faces?.map((s) => (
                 <option key={s.name} value={s.name}>
-                  {s.name}
+                  {formatFaceSampleName(s.name)}
                 </option>
               ))}
             </select>
@@ -532,6 +556,20 @@ export default function FaceTab({ samples, onAddHistory, setMultimodalFace }) {
             {mode !== 'webcam' && previewUrl && (
               <div className="preview-container">
                 <img src={previewUrl} alt="Face Preview" className="image-preview" />
+                <div className="image-info-tag">
+                  <span className="image-source-badge">
+                    {mode === 'sample'
+                      ? formatFaceSampleName(selectedSample)
+                      : selectedFile
+                      ? `📄 ${selectedFile.name}`
+                      : '🖼️ Test Image'}
+                  </span>
+                  {result && (
+                    <span className="image-detect-badge">
+                      {result.num_faces || 1} {result.num_faces === 1 ? 'Face Detected' : 'Faces Detected'}
+                    </span>
+                  )}
+                </div>
                 {mode === 'upload' && (
                   <button
                     className="btn-change-image"
