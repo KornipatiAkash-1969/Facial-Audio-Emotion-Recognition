@@ -10,7 +10,8 @@
 
 An enterprise-grade, dual-modality affective computing platform combining **Computer Vision (Facial Expression Recognition)** and **Acoustic Signal Processing (Speech Emotion Recognition)** with a **Mathematical Decision-Level Late Fusion Engine**.
 
-🌐 **Live Vercel Frontend:** [https://frontend-roan-eight-55.vercel.app](https://frontend-roan-eight-55.vercel.app)
+🌐 **Live Vercel Frontend:** [https://frontend-roan-eight-55.vercel.app](https://frontend-roan-eight-55.vercel.app)  
+🚀 **Deploy Backend on Render (1-Click):** [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/KornipatiAkash-1969/Facial-Audio-Emotion-Recognition)
 
 ---
 
