@@ -7,15 +7,16 @@ import Loader from './Loader';
 export function formatAudioSampleName(name) {
   if (!name) return '';
   const lower = name.toLowerCase();
-  if (lower.includes('tess_happy')) return '😄 Happy Voice — TESS Speech Clip';
-  if (lower.includes('tess_angry')) return '😠 Angry Voice — TESS Speech Clip';
-  if (lower.includes('tess_sad')) return '😢 Sad Voice — TESS Speech Clip';
-  if (lower.includes('tess_surprise')) return '😲 Surprise Voice — TESS Speech Clip';
-  if (lower.includes('tess_fear')) return '😨 Fear Voice — TESS Speech Clip';
-  if (lower.includes('tess_disgust')) return '🤢 Disgust Voice — TESS Speech Clip';
-  if (lower.includes('tess_neutral')) return '😐 Neutral Voice — TESS Speech Clip';
-  if (lower.includes('sample 1')) return '🎙️ Acoustic Speech Sample 1';
-  if (lower.includes('sample 2')) return '🎙️ Acoustic Speech Sample 2';
+  if (lower.includes('happy_test') || lower.includes('tess_happy')) return '😄 Happy Voice — Acoustic Test Clip';
+  if (lower.includes('angry_test') || lower.includes('tess_angry')) return '😠 Angry Voice — Acoustic Test Clip';
+  if (lower.includes('sad_test') || lower.includes('tess_sad')) return '😢 Sad Voice — Acoustic Test Clip';
+  if (lower.includes('surprise_test') || lower.includes('tess_surprise')) return '😲 Surprise Voice — Acoustic Test Clip';
+  if (lower.includes('fear_test') || lower.includes('tess_fear')) return '😨 Fear Voice — Acoustic Test Clip';
+  if (lower.includes('disgust_test') || lower.includes('tess_disgust')) return '🤢 Disgust Voice — Acoustic Test Clip';
+  if (lower.includes('neutral_test') || lower.includes('tess_neutral')) return '😐 Neutral Voice — Acoustic Test Clip';
+  if (lower.includes('speech_test_1') || lower.includes('sample 1')) return '🎙️ Conversational Speech Benchmark 1';
+  if (lower.includes('speech_test_2') || lower.includes('sample 2')) return '🎙️ Conversational Speech Benchmark 2';
+  if (lower.includes('speech_test_3') || lower.includes('sample 3')) return '🎙️ Conversational Speech Benchmark 3';
   return `🎵 ${name}`;
 }
 

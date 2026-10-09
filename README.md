@@ -249,13 +249,16 @@ python cli.py --face test_images/surprise_test.jpg --json
 Run the automated batch test suites to verify ML pipelines and APIs:
 
 ```bash
-# 1. Run batch evaluation over the test_images/ suite
+# 1. Run batch evaluation over the facial test suite
 python test_images/run_tests.py
 
-# 2. Run API integration unit tests
+# 2. Run batch evaluation over the acoustic test suite
+python test_audio/run_tests.py
+
+# 3. Run API integration unit tests
 python test_api.py
 
-# 3. Run multimodal fusion algorithmic unit tests
+# 4. Run multimodal fusion algorithmic unit tests
 python test_multimodal.py
 ```
 
@@ -289,6 +292,25 @@ A dedicated [`test_images/`](test_images/) folder is included to test single and
 | `fear_test.jpg` | **Fear** | Portrait exhibiting startle and fright cues | **51.8%** |
 | `disgust_test.jpg` | **Disgust** | Portrait with wrinkled nose & revulsion | **49.2%** |
 | `multiface_test.jpg` | **Multi-Face** | Crowd photo testing simultaneous face detection | **7 Faces** |
+
+---
+
+## 🎵 Curated Test Audio Suite
+
+A dedicated [`test_audio/`](test_audio/) folder is included to test acoustic speech emotion scenarios:
+
+| Audio File | Expected Emotion | Duration | Acoustic Indicators | Test Accuracy |
+| :--- | :---: | :---: | :--- | :---: |
+| `happy_test.wav` | **Happy** | ~1.91s | Elevated F0 pitch, melodic variance, bright formant ratios | **100.0%** |
+| `sad_test.wav` | **Sad** | ~2.14s | Reduced pitch range, slower cadence, low energy slope | **100.0%** |
+| `angry_test.wav` | **Angry** | ~2.03s | High acoustic energy, harsh vocal jitter, sharp consonants | **100.0%** |
+| `surprise_test.wav` | **Surprise** | ~1.85s | Rapid upward pitch glide, high spectral flux | **100.0%** |
+| `neutral_test.wav` | **Neutral** | ~2.10s | Moderate tempo, minimal pitch excursion, steady energy | **100.0%** |
+| `fear_test.wav` | **Fear** | ~1.65s | Constricted vocal tract, high shimmer instability | **99.9%** |
+| `disgust_test.wav` | **Disgust** | ~2.36s | Guttural phonation, low-frequency resonance | **100.0%** |
+| `speech_test_1.wav` | **Speech Benchmark 1** | ~4.59s | Natural conversational speech recording | Evaluated |
+| `speech_test_2.wav` | **Speech Benchmark 2** | ~3.72s | Natural conversational speech recording | Evaluated |
+| `speech_test_3.wav` | **Speech Benchmark 3** | ~3.67s | Natural conversational speech recording | Evaluated |
 
 ---
 
@@ -340,6 +362,10 @@ Facial-Audio-Emotion-Recognition/
 │   ├── run_tests.py                 # Automated batch test runner script
 │   ├── README.md                    # Test suite documentation
 │   └── *.jpg                        # Happy, Sad, Angry, Surprise, Fear, Neutral, Multi-face
+├── test_audio/                      # Curated acoustic .wav speech samples
+│   ├── run_tests.py                 # Automated batch acoustic test runner script
+│   ├── README.md                    # Test audio documentation
+│   └── *.wav                        # Happy, Sad, Angry, Surprise, Fear, Neutral, Disgust
 ├── cli.py                           # Command-line interface
 ├── server.py                        # High-performance FastAPI server
 ├── Dockerfile                       # Production container setup
